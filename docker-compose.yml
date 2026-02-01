@@ -1,0 +1,34 @@
+services:
+#   server:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:8080"
+#       - "8081:8081"  
+#     depends_on:
+#       - sqlserver
+#     environment:
+#       - DOTNET_USE_POLLING_FILE_WATCHER=true
+#       - ASPNETCORE_ENVIRONMENT=Development
+#       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TransactionDb;User=sa;Password=Your_password123;Encrypt=False;TrustServerCertificate=True;
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+#   frontend:
+#     container_name: angular-client
+#     build:
+#       context: ./_SaveUpClient
+#       dockerfile: Dockerfile
+#     ports:
+#       - "4200:4200"
+#     volumes:
+#       - ./_SaveUpClient:/app
+#       - /app/node_modules
+#     stdin_open: true
+#     tty: true

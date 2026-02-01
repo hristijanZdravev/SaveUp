@@ -1,0 +1,117 @@
+<div class="container-fluid">
+  <form #transactionForm="ngForm" (ngSubmit)="submitTransaction()" class="p-4 border rounded bg-light" novalidate>
+
+    <!-- Transaction Type -->
+    <div class="mb-3">
+      <label for="type" class="form-label">Transaction Type</label>
+      <select
+        id="type"
+        name="type"
+        class="form-select"
+        [(ngModel)]="request.type"
+        #type="ngModel"
+        required
+        [ngModelOptions]="{standalone: false}"
+        [compareWith]="compareById"
+      >
+        <option value="" disabled selected>Select type</option>
+        <option *ngFor="let t of types" [ngValue]="t">{{ t.name }}</option>
+      </select>
+      <div class="text-danger" *ngIf="type.invalid && (type.dirty || type.touched)">
+        Transaction type is required.
+      </div>
+    </div>
+
+    <!-- Amount -->
+    <div class="mb-3">
+      <label for="amount" class="form-label">Amount</label>
+      <input
+        type="number"
+        step="0.01"
+        min="0.01"
+        class="form-control"
+        id="amount"
+        name="amount"
+        [(ngModel)]="request.amount"
+        #amount="ngModel"
+        required
+        [ngModelOptions]="{standalone: false}"
+      />
+      <div class="text-danger" *ngIf="amount.invalid && (amount.dirty || amount.touched)">
+        <div *ngIf="amount.errors?.['required']">Amount is required.</div>
+        <div *ngIf="amount.errors?.['min']">Amount must be greater than 0.</div>
+      </div>
+    </div>
+
+    <!-- Currency -->
+    <div class="mb-3">
+      <label for="currency" class="form-label">Currency</label>
+      <select
+        id="currency"
+        name="currency"
+        class="form-select"
+        [(ngModel)]="request.currency"
+        #currency="ngModel"
+        required
+        [ngModelOptions]="{standalone: false}"
+        [compareWith]="compareById"
+      >
+        <option value="" disabled selected>Select currency</option>
+        <option *ngFor="let c of currencies" [ngValue]="c">{{ c.name }}</option>
+      </select>
+      <div class="text-danger" *ngIf="currency.invalid && (currency.dirty || currency.touched)">
+        Currency is required.
+      </div>
+    </div>
+
+    <!-- Is Domestic -->
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="isDomestic"
+        name="isDomestic"
+        class="form-check-input"
+        [(ngModel)]="request.isDomestic"
+        #isDomestic="ngModel"
+        [ngModelOptions]="{standalone: false}"
+      />
+      <label for="isDomestic" class="form-check-label">Is Domestic</label>
+    </div>
+
+    <div class="mb-3">
+    <label for="client" class="form-label">Client</label>
+      <select
+        id="client"
+        class="form-select"
+        [(ngModel)]="request.client"
+        name="client"
+        required
+        [compareWith]="compareById"
+        #client="ngModel"
+      >
+        <option [ngValue]="null" disabled selected>Select client</option>
+        <option *ngFor="let client of clients" [ngValue]="client">
+          {{ client.id }} - Credit Score: {{ client.creditScore }} ({{ client.segment.name }})
+        </option>
+      </select>
+      <div *ngIf="client.invalid && client.touched" class="text-danger">
+        Client selection is required.
+      </div>
+    </div>
+
+    <!-- Submit button -->
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="transactionForm.invalid"
+    >
+      Calculate Fee
+    </button>
+  </form>
+
+  <!-- Display response -->
+  <div *ngIf="response" class="mt-4 p-3 border rounded bg-white">
+    <h5>Calculation Result:</h5>
+    <pre class="bg-light p-3 rounded">{{ response | json }}</pre>
+  </div>
+</div>

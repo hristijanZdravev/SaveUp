@@ -1,0 +1,68 @@
+# .NET
+bin/
+obj/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+*.db
+*.pdb
+*.cache
+*.log
+*.nupkg
+*.snupkg
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+
+# ASP.NET specific
+appsettings.Development.json
+appsettings.Local.json
+
+# Angular
+_SaveUpClient/node_modules/
+_SaveUpClient/dist/
+_SaveUpClient/.angular/
+_SaveUpClient/.env
+_SaveUpClient/.env.*.local
+_SaveUpClient/*.local.*
+_SaveUpClient/.vscode/
+
+# IDE/Tooling
+.idea/
+*.iml
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS-specific
+Thumbs.db
+ehthumbs.db
+*.DS_Store
+Desktop.ini
+
+# Others
+*.bak
+*.old
+*.tmp
+*.orig
+*.rej
+
+# Test coverage
+coverage/
+_SaveUpClient/coverage/
+
+# Optional lock files
+# Uncomment the one you don't want to commit
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
