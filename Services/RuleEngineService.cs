@@ -2,9 +2,9 @@
 using System.Data;
 using SaveUp.DTOs;
 using SaveUp.DTOs.Helper;
-using SaveUp.Models;
 using SaveUp.Repository.Interfaces;
 using SaveUp.Services.Implementations;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.Services
 {

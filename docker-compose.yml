@@ -12,14 +12,6 @@ services:
 #       - DOTNET_USE_POLLING_FILE_WATCHER=true
 #       - ASPNETCORE_ENVIRONMENT=Development
 #       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TransactionDb;User=sa;Password=Your_password123;Encrypt=False;TrustServerCertificate=True;
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
-    environment:
-      SA_PASSWORD: "Your_password123"
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
 #   frontend:
 #     container_name: angular-client
 #     build:
@@ -32,3 +24,19 @@ services:
 #       - /app/node_modules
 #     stdin_open: true
 #     tty: true
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+  keycloak:
+      image: quay.io/keycloak/keycloak:26.0.5
+      environment:
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+      entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
+      ports:
+        - 8080:8080

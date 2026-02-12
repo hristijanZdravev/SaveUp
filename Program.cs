@@ -1,8 +1,11 @@
-
+﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using SaveUp.Data;
 using SaveUp.DTOs;
-using SaveUp.Models;
+using SaveUp.Models.Transactions;
 using SaveUp.Repository;
 using SaveUp.Repository.Interfaces;
 using SaveUp.Services;
@@ -35,9 +38,10 @@ namespace SaveUp
 
             builder.Services.AddControllers();
 
+            // Cross-Origin 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAngular", policy =>
+                options.AddPolicy("AllowOrigin", policy =>
                 {
                     policy.WithOrigins("http://localhost:4200")
                           .AllowAnyMethod()
@@ -48,7 +52,85 @@ namespace SaveUp
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                // KeyCloak
+                c.CustomSchemaIds(type => type.ToString());
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "KEYCLOAK",
+                    Type = SecuritySchemeType.OAuth2,
+                    In = ParameterLocation.Header,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer",
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri(builder.Configuration["Jwt:AuthorizationUrl"]),
+                            TokenUrl = new Uri(builder.Configuration["Jwt:TokenUrl"]),
+                            Scopes = new Dictionary<string, string> { }
+                        }
+                    },
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                                                {securityScheme, new string[] { }}
+                                            });
+            });
+
+            // KeyCloak
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(o =>
+            {
+                o.Authority = builder.Configuration["Jwt:Authority"];
+                o.Audience = builder.Configuration["Jwt:Audience"];
+                o.RequireHttpsMetadata = false;
+
+                o.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateAudience = true,
+                    NameClaimType = "preferred_username",
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                };
+
+                o.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var identity = context.Principal.Identity as System.Security.Claims.ClaimsIdentity;
+
+                        var realmAccess = context.Principal.FindFirst("realm_access")?.Value;
+
+                        if (realmAccess != null)
+                        {
+                            var parsed = System.Text.Json.JsonDocument.Parse(realmAccess);
+
+                            if (parsed.RootElement.TryGetProperty("roles", out var roles))
+                            {
+                                foreach (var role in roles.EnumerateArray())
+                                {
+                                    identity.AddClaim(new System.Security.Claims.Claim(
+                                        System.Security.Claims.ClaimTypes.Role,
+                                        role.GetString()
+                                    ));
+                                }
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
             var app = builder.Build();
 
@@ -56,14 +138,22 @@ namespace SaveUp
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GymAPI");
+                    c.OAuthClientId(builder.Configuration["Jwt:ClientId"]);
+                    c.OAuthClientSecret(builder.Configuration["Jwt:ClientSecret"]);
+                    c.OAuthRealm(builder.Configuration["Jwt:Realm"]);
+                    c.OAuthAppName("KEYCLOAK");
+                });
             }
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors("AllowOrigin");
 
-            app.UseCors("AllowAngular");
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

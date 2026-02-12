@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SaveUp.Models;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.DTOs
 {

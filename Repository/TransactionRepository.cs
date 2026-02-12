@@ -1,5 +1,5 @@
 ﻿using SaveUp.Data;
-using SaveUp.Models;
+using SaveUp.Models.Transactions;
 using SaveUp.Repository.Interfaces;
 
 namespace SaveUp.Repository

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SaveUp.Models
+namespace SaveUp.Models.Transactions
 {
-    public class TransactionType
+    public class Currency
     {
         [Key]
         public int Id { get; set; }
@@ -10,5 +10,6 @@ namespace SaveUp.Models
         public required string Name { get; set; }
 
         List<Transaction> Transactions { get; set; } = new List<Transaction>();
+
     }
 }

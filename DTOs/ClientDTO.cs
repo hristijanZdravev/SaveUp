@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SaveUp.Models;
 using SaveUp.Models.Enum;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.DTOs
 {

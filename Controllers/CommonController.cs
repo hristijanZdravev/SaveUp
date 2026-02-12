@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SaveUp.DTOs;
-using SaveUp.Models;
+using SaveUp.Models.Transactions;
 using SaveUp.Repository.Interfaces;
 
 namespace SaveUp.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CommonController : ControllerBase
     {
         public readonly ICommonRepository<Currency, CurrencyDTO> _currencyRepository;
@@ -24,6 +27,7 @@ namespace SaveUp.Controllers
             _transactionTypeRepository = transactionTypeRepository;
         }
 
+        [Authorize(Roles = "user")]
         [HttpGet("clients")]
         public async Task<ActionResult<List<ClientDTO>>> GetClients()
         {
@@ -31,6 +35,7 @@ namespace SaveUp.Controllers
             return Ok(clientDTOs);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("type")]
         public async Task<ActionResult<List<TransactionTypeDTO>>> GetTransactionTypes()
         {

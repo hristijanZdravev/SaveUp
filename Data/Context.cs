@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using SaveUp.Models;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.Data
 {

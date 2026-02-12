@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
-using SaveUp.Models;
 using SaveUp.Models.Enum;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.Data
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SaveUp.Models
+namespace SaveUp.Models.Transactions
 {
     public class FeeCalculationHistory
     {

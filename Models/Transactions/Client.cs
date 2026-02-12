@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using SaveUp.Models.Enum;
 
-namespace SaveUp.Models
+namespace SaveUp.Models.Transactions
 {
     public class Client
     {

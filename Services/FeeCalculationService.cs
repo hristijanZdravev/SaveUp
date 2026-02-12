@@ -6,9 +6,9 @@ using System;
 using System.Text.Json;
 using SaveUp.Data;
 using SaveUp.DTOs;
-using SaveUp.Models;
 using SaveUp.Repository.Interfaces;
 using SaveUp.Services.Implementations;
+using SaveUp.Models.Transactions;
 
 namespace SaveUp.Services
 {
