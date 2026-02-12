@@ -1,0 +1,12 @@
+<div>
+  <div *ngIf="authService.isUser()">
+    <h1>
+      User Content
+    </h1>
+  </div>
+  <div *ngIf="authService.isAdmin()">
+    <h1>
+      Admin Content
+    </h1>
+  </div>
+</div>

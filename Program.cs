@@ -4,12 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SaveUp.Data;
-using SaveUp.DTOs;
-using SaveUp.Models.Transactions;
-using SaveUp.Repository;
-using SaveUp.Repository.Interfaces;
-using SaveUp.Services;
-using SaveUp.Services.Implementations;
 
 namespace SaveUp
 {
@@ -23,17 +17,6 @@ namespace SaveUp
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                         //sqlOptions => sqlOptions.EnableRetryOnFailure()
             );
-
-            // Add services to the container.
-            builder.Services.AddScoped<IFeeCalculationHistoryRepository,FeeCalculationHistoryRepository>();
-            builder.Services.AddScoped<IFeeRuleRepository, FeeRuleRepository>();
-            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-            builder.Services.AddScoped<ICommonRepository<Currency, CurrencyDTO>, CurrencyRepository>();
-            builder.Services.AddScoped<ICommonRepository<TransactionType, TransactionTypeDTO>, TransactionTypeRepository>();
-            builder.Services.AddScoped<ICommonRepository<Client, ClientDTO>, ClientRepository>();
-
-            builder.Services.AddSingleton<IRuleEngineService, RuleEngineService>();
-            builder.Services.AddScoped<IFeeCalculationService, FeeCalculationService>();
 
 
             builder.Services.AddControllers();

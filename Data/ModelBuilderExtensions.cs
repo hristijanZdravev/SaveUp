@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
-using SaveUp.Models.Enum;
-using SaveUp.Models.Transactions;
+using SaveUp.Models;
 
 namespace SaveUp.Data
 {
@@ -10,139 +8,162 @@ namespace SaveUp.Data
 
         public static void ConfigureEntinties(this ModelBuilder builder)
         {
-            builder.Entity<FeeRule>().HasIndex(f => f.Name).IsUnique();
-            builder.Entity<Currency>().HasIndex(c => c.Name).IsUnique();
-            builder.Entity<TransactionType>().HasIndex(t => t.Name).IsUnique();
-            builder.Entity<ClientSegment>().HasIndex(c => c.Name).IsUnique();
 
-            builder.Entity<FeeCalculationHistory>()
-            .HasMany(f => f.FeeRules)
-            .WithMany(f => f.FeeCalculationHistories)
-            .UsingEntity(j => j.ToTable("FeeRuleHistories"));
         }
 
         public static Task SeedData(this ModelBuilder modelBuilder)
         {
-            // Seed data logic can be implemented here
+            // =========================
+            // BODY GROUPS
+            // =========================
+            var chestId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var backId = Guid.Parse("22222222-1111-1111-1111-111111111111");
+            var legsId = Guid.Parse("33333333-1111-1111-1111-111111111111");
+            var shouldersId = Guid.Parse("44444444-1111-1111-1111-111111111111");
 
-            FeeRule[] FeeRules =
+            BodyGroup[] bodyGroups =
             [
-                new FeeRule
-                {
-                    Id = 1,
-                    Name = "POS under 100€ – Fixed",
-                    ConditionExpression = "Type == 'POS' && Amount <= 100",
-                    CalculationExpression = "0.20"
-                },
-                new FeeRule
-                {
-                    Id = 2,
-                    Name = "POS over 100€ – Percentage",
-                    ConditionExpression = "Type == 'POS' && Amount > 100",
-                    CalculationExpression = "Amount * 0.002" // 0.2%
-                },
-                new FeeRule
-                {
-                    Id = 3,
-                    Name = "E-Commerce – Percent + Fixed",
-                    ConditionExpression = "Type == 'e-commerce'",
-                    CalculationExpression = "Amount * 0.018 + 0.15",
-                    MaxFee = (double?)120m
-                },
-                new FeeRule
-                {
-                    Id = 4,
-                    Name = "High Credit Score – Discount",
-                    ConditionExpression = "CreditScore > 400",
-                    CalculationExpression = "0", // dummy fee; discount is applied to the total
-                    DiscountPercent = (double?)1m
-                },
+                new BodyGroup { Id = chestId, Name = "Chest", SubGroup = null },
+        new BodyGroup { Id = backId, Name = "Back", SubGroup = null },
+        new BodyGroup { Id = legsId, Name = "Legs", SubGroup = null },
+        new BodyGroup { Id = shouldersId, Name = "Shoulders", SubGroup = null }
             ];
-            modelBuilder.Entity<FeeRule>().HasData(FeeRules);
 
-            Currency[] Currencies =
+            modelBuilder.Entity<BodyGroup>().HasData(bodyGroups);
+
+            // =========================
+            // EXERCISES
+            // =========================
+            var benchId = Guid.Parse("aaaaaaa1-1111-1111-1111-111111111111");
+            var inclineId = Guid.Parse("aaaaaaa2-1111-1111-1111-111111111111");
+            var pullupId = Guid.Parse("aaaaaaa3-1111-1111-1111-111111111111");
+            var squatId = Guid.Parse("aaaaaaa4-1111-1111-1111-111111111111");
+            var shoulderPressId = Guid.Parse("aaaaaaa5-1111-1111-1111-111111111111");
+
+            Exercise[] exercises =
             [
-                new Currency
-                {
-                    Id = 1,
-                    Name = "EUR",
-                },
-                new Currency
-                {
-                    Id = 2,
-                    Name = "MKD",
-                },
-                new Currency
-                {
-                    Id = 3,
-                    Name = "USD",
-                },
-
+                new Exercise
+        {
+            Id = benchId,
+            Title = "Barbell Bench Press",
+            Description = "Compound chest pressing movement.",
+            BodyGroupId = chestId
+        },
+        new Exercise
+        {
+            Id = inclineId,
+            Title = "Incline Dumbbell Press",
+            Description = "Upper chest focused pressing movement.",
+            BodyGroupId = chestId
+        },
+        new Exercise
+        {
+            Id = pullupId,
+            Title = "Pull Ups",
+            Description = "Bodyweight vertical pulling movement.",
+            BodyGroupId = backId
+        },
+        new Exercise
+        {
+            Id = squatId,
+            Title = "Barbell Squats",
+            Description = "Compound lower body movement.",
+            BodyGroupId = legsId
+        },
+        new Exercise
+        {
+            Id = shoulderPressId,
+            Title = "Shoulder Press",
+            Description = "Overhead pressing for shoulders.",
+            BodyGroupId = shouldersId
+        }
             ];
-            modelBuilder.Entity<Currency>().HasData(Currencies);
 
-            ClientSegment[] ClientSegments =
+            modelBuilder.Entity<Exercise>().HasData(exercises);
+
+            // =========================
+            // WORKOUT
+            // =========================
+            var workoutId = Guid.Parse("90000000-0000-0000-0000-000000000001");
+
+            Workout[] workouts =
             [
-                new ClientSegment
-                {
-                    Id = 1,
-                    Name = "Regular",
-                },
-                new ClientSegment
-                {
-                    Id = 2,
-                    Name = "Trusted",
-                },
-                new ClientSegment
-                {
-                    Id = 3,
-                    Name = "Premium",
-                },
+                new Workout
+        {
+            Id = workoutId,
+            UserId = "user@test.com",
+            Date = new DateTime(2026, 2, 10),
+            Title = "Push Day"
+        }
             ];
-            modelBuilder.Entity<ClientSegment>().HasData(ClientSegments);
 
+            modelBuilder.Entity<Workout>().HasData(workouts);
 
-            Client[] Clients =
+            // =========================
+            // WORKOUT EXERCISES
+            // =========================
+            var workoutBenchId = Guid.Parse("90000000-0000-0000-0000-000000000002");
+            var workoutShoulderId = Guid.Parse("90000000-0000-0000-0000-000000000003");
+
+            WorkoutExercise[] workoutExercises =
             [
-                new Client
-                {
-                    Id = 1,
-                    CreditScore = 400,
-                    RiskLevel = RiskLevel.Low,
-                    ClientSegmentId = ClientSegments[0].Id                },
-                new Client
-                {
-                    Id = 2,
-                    CreditScore = 400,
-                    RiskLevel = RiskLevel.Low,
-                    ClientSegmentId = ClientSegments[0].Id
-                },
+                new WorkoutExercise
+        {
+            Id = workoutBenchId,
+            WorkoutId = workoutId,
+            ExerciseId = benchId,
+            Order = 1,
+            Notes = null
+        },
+        new WorkoutExercise
+        {
+            Id = workoutShoulderId,
+            WorkoutId = workoutId,
+            ExerciseId = shoulderPressId,
+            Order = 2,
+            Notes = null
+        }
             ];
-            modelBuilder.Entity<Client>().HasData(Clients);
 
-            TransactionType[] TransactionTypes =
+            modelBuilder.Entity<WorkoutExercise>().HasData(workoutExercises);
+
+            // =========================
+            // WORKOUT SETS
+            // =========================
+            WorkoutSet[] workoutSets =
             [
-                new TransactionType
-                {
-                    Id = 1,
-                    Name = "POS",
-                },
-                new TransactionType
-                {
-                    Id = 2,
-                    Name = "e-commerce",
-                },
-                new TransactionType
-                {
-                    Id = 3,
-                    Name = "ATM",
-                },
+                new WorkoutSet
+        {
+            Id = Guid.Parse("90000000-0000-0000-0000-000000000004"),
+            WorkoutExerciseId = workoutBenchId,
+            SetNumber = 1,
+            Reps = 10,
+            Weight = 80,
+            DurationSeconds = null
+        },
+        new WorkoutSet
+        {
+            Id = Guid.Parse("90000000-0000-0000-0000-000000000005"),
+            WorkoutExerciseId = workoutBenchId,
+            SetNumber = 2,
+            Reps = 8,
+            Weight = 85,
+            DurationSeconds = null
+        },
+        new WorkoutSet
+        {
+            Id = Guid.Parse("90000000-0000-0000-0000-000000000006"),
+            WorkoutExerciseId = workoutShoulderId,
+            SetNumber = 1,
+            Reps = 12,
+            Weight = 25,
+            DurationSeconds = null
+        }
             ];
-            modelBuilder.Entity<TransactionType>().HasData(TransactionTypes);
 
+            modelBuilder.Entity<WorkoutSet>().HasData(workoutSets);
 
             return Task.CompletedTask;
         }
-
     }
-}
+}   

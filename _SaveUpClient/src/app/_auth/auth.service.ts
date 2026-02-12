@@ -28,4 +28,14 @@ export class AuthService {
   getUserRoles(): any[] {
     return this.keycloak.getUserRoles()
   }
+
+  isAdmin(): boolean {
+    const roles = this.getUserRoles();
+    return roles.includes('admin');
+  }
+
+  isUser(): boolean {
+    const roles = this.getUserRoles();
+    return roles.includes('user');
+  }
 }

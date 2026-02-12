@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using SaveUp.Models.Transactions;
+using SaveUp.Models;
 
 namespace SaveUp.Data
 {
@@ -12,17 +10,12 @@ namespace SaveUp.Data
         {
         }
 
-        public DbSet<FeeRule> FeeRules { get; set; }
-        public DbSet<FeeCalculationHistory> FeeCalculationHistories { get; set; }
+        public DbSet<BodyGroup> BodyGroups { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
 
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<TransactionType> TransactionTypes { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
-
-        public DbSet<Client> Clients { get; set; }
-
-        public DbSet<ClientSegment> ClientSegments { get; set; }
-
+        public DbSet<Workout> Workouts { get; set; }
+        public DbSet<WorkoutExercise> WorkoutExercises { get; set; }
+        public DbSet<WorkoutSet> WorkoutSets { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
