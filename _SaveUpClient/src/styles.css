@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Default to dark theme */
+html {
+  scroll-behavior: smooth;
+}
+
+html.dark-theme {
+  color-scheme: dark;
+}
+
+html.light-theme {
+  color-scheme: light;
+}
+
+/* Text color switches with theme (html has .dark-theme or .light-theme) */
+body {
+  transition: color 0.3s ease;
+}
+
+html.dark-theme,
+html.dark-theme body {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+html.light-theme,
+html.light-theme body {
+  color: rgba(0, 0, 0, 0.85);
+}

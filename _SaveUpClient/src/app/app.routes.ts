@@ -5,12 +5,30 @@ import { authGuard } from './_auth/guard/auth.guard';
 
 export const routes: Routes = [
     {
-        path: 'home',
+        path: '',
         pathMatch: 'full',
+        redirectTo: 'dashboard'
+    },
+    {
+        path: 'dashboard',
         canActivate: [authGuard],
         loadComponent : () =>
-            import('./main/main.component')
-        .then((mod) => mod.MainComponent)
+            import('./user/dashboard/dashboard.component')
+        .then((mod) => mod.DashboardComponent)
+    },
+    {
+        path: 'workouts',
+        canActivate: [authGuard],
+        loadComponent : () =>
+            import('./user/workouts/workouts.component')
+        .then((mod) => mod.WorkoutsComponent)
+    },
+    {
+        path: 'progress',
+        canActivate: [authGuard],
+        loadComponent : () =>
+            import('./user/progress/progress.component')
+        .then((mod) => mod.ProgressComponent)
     },
     {
         path: 'logout',
