@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace SaveUp.Migrations
 {
     /// <inheritdoc />
@@ -108,53 +106,6 @@ namespace SaveUp.Migrations
                         principalTable: "WorkoutExercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "BodyGroups",
-                columns: new[] { "Id", "Name", "SubGroup" },
-                values: new object[,]
-                {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), "Chest", null },
-                    { new Guid("22222222-1111-1111-1111-111111111111"), "Back", null },
-                    { new Guid("33333333-1111-1111-1111-111111111111"), "Legs", null },
-                    { new Guid("44444444-1111-1111-1111-111111111111"), "Shoulders", null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Workouts",
-                columns: new[] { "Id", "Date", "Title", "UserId" },
-                values: new object[] { new Guid("90000000-0000-0000-0000-000000000001"), new DateTime(2026, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "Push Day", "user@test.com" });
-
-            migrationBuilder.InsertData(
-                table: "Exercises",
-                columns: new[] { "Id", "BodyGroupId", "Description", "ImageUrl", "Title" },
-                values: new object[,]
-                {
-                    { new Guid("aaaaaaa1-1111-1111-1111-111111111111"), new Guid("11111111-1111-1111-1111-111111111111"), "Compound chest pressing movement.", null, "Barbell Bench Press" },
-                    { new Guid("aaaaaaa2-1111-1111-1111-111111111111"), new Guid("11111111-1111-1111-1111-111111111111"), "Upper chest focused pressing movement.", null, "Incline Dumbbell Press" },
-                    { new Guid("aaaaaaa3-1111-1111-1111-111111111111"), new Guid("22222222-1111-1111-1111-111111111111"), "Bodyweight vertical pulling movement.", null, "Pull Ups" },
-                    { new Guid("aaaaaaa4-1111-1111-1111-111111111111"), new Guid("33333333-1111-1111-1111-111111111111"), "Compound lower body movement.", null, "Barbell Squats" },
-                    { new Guid("aaaaaaa5-1111-1111-1111-111111111111"), new Guid("44444444-1111-1111-1111-111111111111"), "Overhead pressing for shoulders.", null, "Shoulder Press" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutExercises",
-                columns: new[] { "Id", "ExerciseId", "Notes", "Order", "WorkoutId" },
-                values: new object[,]
-                {
-                    { new Guid("90000000-0000-0000-0000-000000000002"), new Guid("aaaaaaa1-1111-1111-1111-111111111111"), null, 1, new Guid("90000000-0000-0000-0000-000000000001") },
-                    { new Guid("90000000-0000-0000-0000-000000000003"), new Guid("aaaaaaa5-1111-1111-1111-111111111111"), null, 2, new Guid("90000000-0000-0000-0000-000000000001") }
-                });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutSets",
-                columns: new[] { "Id", "DurationSeconds", "Reps", "SetNumber", "Weight", "WorkoutExerciseId" },
-                values: new object[,]
-                {
-                    { new Guid("90000000-0000-0000-0000-000000000004"), null, 10, 1, 80m, new Guid("90000000-0000-0000-0000-000000000002") },
-                    { new Guid("90000000-0000-0000-0000-000000000005"), null, 8, 2, 85m, new Guid("90000000-0000-0000-0000-000000000002") },
-                    { new Guid("90000000-0000-0000-0000-000000000006"), null, 12, 1, 25m, new Guid("90000000-0000-0000-0000-000000000003") }
                 });
 
             migrationBuilder.CreateIndex(

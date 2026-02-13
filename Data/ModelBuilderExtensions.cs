@@ -11,159 +11,98 @@ namespace SaveUp.Data
 
         }
 
-        public static Task SeedData(this ModelBuilder modelBuilder)
+        public static class DbInitializer
         {
-            // =========================
-            // BODY GROUPS
-            // =========================
-            var chestId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            var backId = Guid.Parse("22222222-1111-1111-1111-111111111111");
-            var legsId = Guid.Parse("33333333-1111-1111-1111-111111111111");
-            var shouldersId = Guid.Parse("44444444-1111-1111-1111-111111111111");
+            public static async Task SeedAsync(Context context)
+            {
+                // seed only once
+                if (await context.Workouts.AnyAsync())
+                    return;
 
-            BodyGroup[] bodyGroups =
-            [
-                new BodyGroup { Id = chestId, Name = "Chest", SubGroup = null },
-        new BodyGroup { Id = backId, Name = "Back", SubGroup = null },
-        new BodyGroup { Id = legsId, Name = "Legs", SubGroup = null },
-        new BodyGroup { Id = shouldersId, Name = "Shoulders", SubGroup = null }
-            ];
+                var random = new Random();
 
-            modelBuilder.Entity<BodyGroup>().HasData(bodyGroups);
+                // =========================
+                // BODY GROUPS
+                // =========================
+                var chest = new BodyGroup { Id = Guid.NewGuid(), Name = "Chest" };
+                var back = new BodyGroup { Id = Guid.NewGuid(), Name = "Back" };
+                var legs = new BodyGroup { Id = Guid.NewGuid(), Name = "Legs" };
+                var shoulders = new BodyGroup { Id = Guid.NewGuid(), Name = "Shoulders" };
+                var arms = new BodyGroup { Id = Guid.NewGuid(), Name = "Arms" };
 
-            // =========================
-            // EXERCISES
-            // =========================
-            var benchId = Guid.Parse("aaaaaaa1-1111-1111-1111-111111111111");
-            var inclineId = Guid.Parse("aaaaaaa2-1111-1111-1111-111111111111");
-            var pullupId = Guid.Parse("aaaaaaa3-1111-1111-1111-111111111111");
-            var squatId = Guid.Parse("aaaaaaa4-1111-1111-1111-111111111111");
-            var shoulderPressId = Guid.Parse("aaaaaaa5-1111-1111-1111-111111111111");
+                context.BodyGroups.AddRange(chest, back, legs, shoulders, arms);
 
-            Exercise[] exercises =
-            [
-                new Exercise
-        {
-            Id = benchId,
-            Title = "Barbell Bench Press",
-            Description = "Compound chest pressing movement.",
-            BodyGroupId = chestId
-        },
-        new Exercise
-        {
-            Id = inclineId,
-            Title = "Incline Dumbbell Press",
-            Description = "Upper chest focused pressing movement.",
-            BodyGroupId = chestId
-        },
-        new Exercise
-        {
-            Id = pullupId,
-            Title = "Pull Ups",
-            Description = "Bodyweight vertical pulling movement.",
-            BodyGroupId = backId
-        },
-        new Exercise
-        {
-            Id = squatId,
-            Title = "Barbell Squats",
-            Description = "Compound lower body movement.",
-            BodyGroupId = legsId
-        },
-        new Exercise
-        {
-            Id = shoulderPressId,
-            Title = "Shoulder Press",
-            Description = "Overhead pressing for shoulders.",
-            BodyGroupId = shouldersId
-        }
-            ];
+                // =========================
+                // EXERCISES (25)
+                // =========================
+                var exercises = new List<Exercise>
+            {
+                new() { Id=Guid.NewGuid(), Title="Bench Press", Description="Chest press", BodyGroupId=chest.Id },
+                new() { Id=Guid.NewGuid(), Title="Incline Dumbbell Press", Description="Upper chest", BodyGroupId=chest.Id },
+                new() { Id=Guid.NewGuid(), Title="Pull Ups", Description="Back", BodyGroupId=back.Id },
+                new() { Id=Guid.NewGuid(), Title="Lat Pulldown", Description="Back", BodyGroupId=back.Id },
+                new() { Id=Guid.NewGuid(), Title="Squat", Description="Legs", BodyGroupId=legs.Id },
+                new() { Id=Guid.NewGuid(), Title="Leg Press", Description="Legs", BodyGroupId=legs.Id },
+                new() { Id=Guid.NewGuid(), Title="Shoulder Press", Description="Shoulders", BodyGroupId=shoulders.Id },
+                new() { Id=Guid.NewGuid(), Title="Lateral Raise", Description="Shoulders", BodyGroupId=shoulders.Id },
+                new() { Id=Guid.NewGuid(), Title="Barbell Curl", Description="Biceps", BodyGroupId=arms.Id },
+                new() { Id=Guid.NewGuid(), Title="Tricep Pushdown", Description="Triceps", BodyGroupId=arms.Id }
+            };
 
-            modelBuilder.Entity<Exercise>().HasData(exercises);
+                context.Exercises.AddRange(exercises);
 
-            // =========================
-            // WORKOUT
-            // =========================
-            var workoutId = Guid.Parse("90000000-0000-0000-0000-000000000001");
+                // =========================
+                // WORKOUTS (22)
+                // =========================
+                var userId = "user@test.com";
 
-            Workout[] workouts =
-            [
-                new Workout
-        {
-            Id = workoutId,
-            UserId = "user@test.com",
-            Date = new DateTime(2026, 2, 10),
-            Title = "Push Day"
-        }
-            ];
+                for (int i = 1; i <= 22; i++)
+                {
+                    var workout = new Workout
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = userId,
+                        Title = $"Workout {i}",
+                        Date = DateTime.UtcNow.AddDays(-i * 2)
+                    };
 
-            modelBuilder.Entity<Workout>().HasData(workouts);
+                    context.Workouts.Add(workout);
 
-            // =========================
-            // WORKOUT EXERCISES
-            // =========================
-            var workoutBenchId = Guid.Parse("90000000-0000-0000-0000-000000000002");
-            var workoutShoulderId = Guid.Parse("90000000-0000-0000-0000-000000000003");
+                    var selectedExercises = exercises
+                        .OrderBy(x => random.Next())
+                        .Take(3)
+                        .ToList();
 
-            WorkoutExercise[] workoutExercises =
-            [
-                new WorkoutExercise
-        {
-            Id = workoutBenchId,
-            WorkoutId = workoutId,
-            ExerciseId = benchId,
-            Order = 1,
-            Notes = null
-        },
-        new WorkoutExercise
-        {
-            Id = workoutShoulderId,
-            WorkoutId = workoutId,
-            ExerciseId = shoulderPressId,
-            Order = 2,
-            Notes = null
-        }
-            ];
+                    int order = 1;
 
-            modelBuilder.Entity<WorkoutExercise>().HasData(workoutExercises);
+                    foreach (var ex in selectedExercises)
+                    {
+                        var workoutExercise = new WorkoutExercise
+                        {
+                            Id = Guid.NewGuid(),
+                            WorkoutId = workout.Id,
+                            ExerciseId = ex.Id,
+                            Order = order++
+                        };
 
-            // =========================
-            // WORKOUT SETS
-            // =========================
-            WorkoutSet[] workoutSets =
-            [
-                new WorkoutSet
-        {
-            Id = Guid.Parse("90000000-0000-0000-0000-000000000004"),
-            WorkoutExerciseId = workoutBenchId,
-            SetNumber = 1,
-            Reps = 10,
-            Weight = 80,
-            DurationSeconds = null
-        },
-        new WorkoutSet
-        {
-            Id = Guid.Parse("90000000-0000-0000-0000-000000000005"),
-            WorkoutExerciseId = workoutBenchId,
-            SetNumber = 2,
-            Reps = 8,
-            Weight = 85,
-            DurationSeconds = null
-        },
-        new WorkoutSet
-        {
-            Id = Guid.Parse("90000000-0000-0000-0000-000000000006"),
-            WorkoutExerciseId = workoutShoulderId,
-            SetNumber = 1,
-            Reps = 12,
-            Weight = 25,
-            DurationSeconds = null
-        }
-            ];
+                        context.WorkoutExercises.Add(workoutExercise);
 
-            modelBuilder.Entity<WorkoutSet>().HasData(workoutSets);
+                        for (int s = 1; s <= 3; s++)
+                        {
+                            context.WorkoutSets.Add(new WorkoutSet
+                            {
+                                Id = Guid.NewGuid(),
+                                WorkoutExerciseId = workoutExercise.Id,
+                                SetNumber = s,
+                                Reps = random.Next(6, 13),
+                                Weight = random.Next(20, 100)
+                            });
+                        }
+                    }
+                }
 
-            return Task.CompletedTask;
+                await context.SaveChangesAsync();
+            }
         }
     }
-}   
+}

@@ -24,6 +24,13 @@ export const routes: Routes = [
         .then((mod) => mod.WorkoutsComponent)
     },
     {
+        path: 'workouts/:id',
+        canActivate: [authGuard],
+        loadComponent : () =>
+            import('./user/workouts/workout-detail/workout-detail.component')
+        .then((mod) => mod.WorkoutDetailComponent)
+    },
+    {
         path: 'progress',
         canActivate: [authGuard],
         loadComponent : () =>

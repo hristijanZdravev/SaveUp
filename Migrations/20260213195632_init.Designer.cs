@@ -12,7 +12,7 @@ using SaveUp.Data;
 namespace SaveUp.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20260212201157_init")]
+    [Migration("20260213195632_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -41,28 +41,6 @@ namespace SaveUp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BodyGroups");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "Chest"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-1111-1111-1111-111111111111"),
-                            Name = "Back"
-                        },
-                        new
-                        {
-                            Id = new Guid("33333333-1111-1111-1111-111111111111"),
-                            Name = "Legs"
-                        },
-                        new
-                        {
-                            Id = new Guid("44444444-1111-1111-1111-111111111111"),
-                            Name = "Shoulders"
-                        });
                 });
 
             modelBuilder.Entity("SaveUp.Models.Exercise", b =>
@@ -89,43 +67,6 @@ namespace SaveUp.Migrations
                     b.HasIndex("BodyGroupId");
 
                     b.ToTable("Exercises");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aaaaaaa1-1111-1111-1111-111111111111"),
-                            BodyGroupId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Description = "Compound chest pressing movement.",
-                            Title = "Barbell Bench Press"
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaaaaa2-1111-1111-1111-111111111111"),
-                            BodyGroupId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Description = "Upper chest focused pressing movement.",
-                            Title = "Incline Dumbbell Press"
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaaaaa3-1111-1111-1111-111111111111"),
-                            BodyGroupId = new Guid("22222222-1111-1111-1111-111111111111"),
-                            Description = "Bodyweight vertical pulling movement.",
-                            Title = "Pull Ups"
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaaaaa4-1111-1111-1111-111111111111"),
-                            BodyGroupId = new Guid("33333333-1111-1111-1111-111111111111"),
-                            Description = "Compound lower body movement.",
-                            Title = "Barbell Squats"
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaaaaa5-1111-1111-1111-111111111111"),
-                            BodyGroupId = new Guid("44444444-1111-1111-1111-111111111111"),
-                            Description = "Overhead pressing for shoulders.",
-                            Title = "Shoulder Press"
-                        });
                 });
 
             modelBuilder.Entity("SaveUp.Models.Workout", b =>
@@ -148,15 +89,6 @@ namespace SaveUp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Workouts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000001"),
-                            Date = new DateTime(2026, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Push Day",
-                            UserId = "user@test.com"
-                        });
                 });
 
             modelBuilder.Entity("SaveUp.Models.WorkoutExercise", b =>
@@ -184,22 +116,6 @@ namespace SaveUp.Migrations
                     b.HasIndex("WorkoutId");
 
                     b.ToTable("WorkoutExercises");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000002"),
-                            ExerciseId = new Guid("aaaaaaa1-1111-1111-1111-111111111111"),
-                            Order = 1,
-                            WorkoutId = new Guid("90000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000003"),
-                            ExerciseId = new Guid("aaaaaaa5-1111-1111-1111-111111111111"),
-                            Order = 2,
-                            WorkoutId = new Guid("90000000-0000-0000-0000-000000000001")
-                        });
                 });
 
             modelBuilder.Entity("SaveUp.Models.WorkoutSet", b =>
@@ -228,32 +144,6 @@ namespace SaveUp.Migrations
                     b.HasIndex("WorkoutExerciseId");
 
                     b.ToTable("WorkoutSets");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000004"),
-                            Reps = 10,
-                            SetNumber = 1,
-                            Weight = 80m,
-                            WorkoutExerciseId = new Guid("90000000-0000-0000-0000-000000000002")
-                        },
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000005"),
-                            Reps = 8,
-                            SetNumber = 2,
-                            Weight = 85m,
-                            WorkoutExerciseId = new Guid("90000000-0000-0000-0000-000000000002")
-                        },
-                        new
-                        {
-                            Id = new Guid("90000000-0000-0000-0000-000000000006"),
-                            Reps = 12,
-                            SetNumber = 1,
-                            Weight = 25m,
-                            WorkoutExerciseId = new Guid("90000000-0000-0000-0000-000000000003")
-                        });
                 });
 
             modelBuilder.Entity("SaveUp.Models.Exercise", b =>

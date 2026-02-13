@@ -1,0 +1,35 @@
+<div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" *ngIf="isOpen">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-circle me-2 text-danger"></i>{{ title }}
+        </h5>
+        <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close" [disabled]="isLoading"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">{{ message }}</p>
+        <p class="fw-bold text-danger" *ngIf="itemName">
+          <i class="bi bi-bookmark me-2"></i>{{ itemName }}
+        </p>
+        <p class="text-muted small mt-3">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isLoading">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="onConfirm()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">
+            <i class="bi bi-trash me-2"></i>Delete
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Deleting...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="isOpen" *ngIf="isOpen" (click)="onBackdropClick()"></div>

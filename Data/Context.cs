@@ -23,7 +23,6 @@ namespace SaveUp.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ConfigureEntinties();
-            modelBuilder.SeedData().Wait();
         }
 
     }

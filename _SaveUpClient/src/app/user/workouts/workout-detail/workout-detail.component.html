@@ -1,0 +1,242 @@
+<div class="container py-5" *ngIf="workout">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <button class="btn btn-outline-secondary mb-3" (click)="goBack()">
+        <i class="bi bi-arrow-left me-2"></i>Back to Workouts
+      </button>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="display-4 fw-bold">{{ workout.title }}</h1>
+          <p class="lead text-muted">
+            <i class="bi bi-calendar3 me-2"></i>{{ formatDate(workout.date) }}
+          </p>
+        </div>
+        <button class="btn btn-primary btn-lg" (click)="openAddExerciseModal()" [disabled]="loading">
+          <i class="bi bi-plus-circle me-2"></i>Add Exercise
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="row mb-3" *ngIf="error">
+    <div class="col-12">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+        <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="row" *ngIf="loading && !workout.workoutExercises.length">
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading workout details...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercises List -->
+  <div class="row" *ngIf="workout.workoutExercises.length === 0 && !loading">
+    <div class="col-12">
+      <div class="card empty-state-card">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
+          <h3 class="mb-3">No exercises added yet</h3>
+          <p class="text-muted mb-4">Add your first exercise to start tracking your sets!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4" *ngIf="workout.workoutExercises.length > 0">
+    <div class="col-lg-6 col-md-6" *ngFor="let workoutExercise of workout.workoutExercises">
+      <div class="card exercise-card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="bi bi-activity me-2 text-primary"></i>{{ workoutExercise.exerciseTitle }}
+            </h5>
+            <button 
+              class="btn btn-sm btn-outline-danger" 
+              (click)="removeExercise(workoutExercise.id)"
+              title="Remove exercise">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Sets Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Set</th>
+                  <th>Reps</th>
+                  <th>Weight (kg)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let set of workoutExercise.sets">
+                  <td>{{ set.setNumber }}</td>
+                  <td *ngIf="!isEditingSet(set.id)">{{ set.reps }}</td>
+                  <td *ngIf="!isEditingSet(set.id)">{{ set.weight }}</td>
+                  <td *ngIf="isEditingSet(set.id)" colspan="2">
+                    <div class="row g-2">
+                      <div class="col-5">
+                        <input 
+                          type="number" 
+                          class="form-control form-control-sm" 
+                          [(ngModel)]="editingSet!.reps"
+                          placeholder="Reps">
+                      </div>
+                      <div class="col-5">
+                        <input 
+                          type="number" 
+                          class="form-control form-control-sm" 
+                          [(ngModel)]="editingSet!.weight"
+                          step="0.5"
+                          placeholder="Weight">
+                      </div>
+                      <div class="col-2">
+                        <button class="btn btn-sm btn-success" (click)="updateSet()">
+                          <i class="bi bi-check"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm" *ngIf="!isEditingSet(set.id)">
+                      <button 
+                        class="btn btn-outline-primary" 
+                        (click)="startEditSet(set, workoutExercise.id)"
+                        title="Edit set">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button 
+                        class="btn btn-outline-danger" 
+                        (click)="deleteSet(set.id)"
+                        title="Delete set">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Add Set Row -->
+                <tr *ngIf="isAddingSet(workoutExercise.id)">
+                  <td>{{ getNextSetNumber(workoutExercise.sets) }}</td>
+                  <td colspan="2">
+                    <div class="row g-2">
+                      <div class="col-5">
+                        <input 
+                          type="number" 
+                          class="form-control form-control-sm" 
+                          [(ngModel)]="editingSet!.reps"
+                          placeholder="Reps">
+                      </div>
+                      <div class="col-5">
+                        <input 
+                          type="number" 
+                          class="form-control form-control-sm" 
+                          [(ngModel)]="editingSet!.weight"
+                          step="0.5"
+                          placeholder="Weight">
+                      </div>
+                      <div class="col-2">
+                        <button class="btn btn-sm btn-success" (click)="addSet()">
+                          <i class="bi bi-check"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-secondary" (click)="closeAddSetModal()">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Add Set Button -->
+          <button 
+            class="btn btn-outline-primary btn-sm mt-2" 
+            (click)="openAddSetModal(workoutExercise.id)"
+            *ngIf="!isAddingSet(workoutExercise.id)">
+            <i class="bi bi-plus-circle me-2"></i>Add Set
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Exercise Modal -->
+<div class="modal fade" [class.show]="showAddExerciseModal" [style.display]="showAddExerciseModal ? 'block' : 'none'" 
+     tabindex="-1" *ngIf="showAddExerciseModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Exercise</h5>
+        <button type="button" class="btn-close" (click)="closeAddExerciseModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Search Input -->
+        <div class="mb-3">
+          <label for="exerciseSearch" class="form-label">Search Exercises</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="exerciseSearch" 
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Type exercise name (e.g., bench press, squat)..."
+            autofocus>
+        </div>
+
+        <!-- Search Results -->
+        <div class="mb-3" *ngIf="showSearchResults && searchResults.length > 0">
+          <div class="list-group">
+            <button 
+              type="button"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+              *ngFor="let exercise of searchResults"
+              (click)="selectExercise(exercise.id)"
+              [disabled]="loading">
+              <span>{{ exercise.title }}</span>
+              <i class="bi bi-plus-circle text-primary"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="alert alert-info" *ngIf="!searching && searchQuery.trim().length > 0 && searchResults.length === 0">
+          <i class="bi bi-info-circle me-2"></i>
+          No exercises found. Try a different search term.
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!searching && searchQuery.trim().length === 0" class="text-center py-4">
+          <i class="bi bi-search display-1 text-muted mb-3"></i>
+          <p class="text-muted">Start typing to search for exercises</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <small *ngIf="searching" class="text-muted">
+          <span class="spinner-border spinner-border-sm text-muted me-2"></span>
+          Searching...
+        </small>
+        <button type="button" class="btn btn-secondary" (click)="closeAddExerciseModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showAddExerciseModal" *ngIf="showAddExerciseModal" (click)="closeAddExerciseModal()"></div>
