@@ -2,17 +2,28 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-circle me-2 text-danger"></i>{{ title }}
-        </h5>
+        <div class="title-wrap">
+          <span class="danger-chip">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </span>
+          <h5 class="modal-title mb-0">{{ title }}</h5>
+        </div>
         <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close" [disabled]="isLoading"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-2">{{ message }}</p>
-        <p class="fw-bold text-danger" *ngIf="itemName">
-          <i class="bi bi-bookmark me-2"></i>{{ itemName }}
-        </p>
-        <p class="text-muted small mt-3">This action cannot be undone.</p>
+        <p class="mb-2 body-message">{{ message }}</p>
+
+        <div class="item-highlight" *ngIf="itemName">
+          <span class="item-label">Selected</span>
+          <p class="mb-0 item-name">
+            <i class="bi bi-bookmark-fill me-2"></i>{{ itemName }}
+          </p>
+        </div>
+
+        <div class="danger-note mt-3">
+          <i class="bi bi-shield-exclamation me-2"></i>
+          <span>This action cannot be undone.</span>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isLoading">

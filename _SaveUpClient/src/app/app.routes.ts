@@ -7,7 +7,13 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'dashboard'
+        redirectTo: 'main'
+    },
+    {
+        path: 'main',
+        loadComponent : () =>
+            import('./main/main.component')
+        .then((mod) => mod.MainComponent)
     },
     {
         path: 'dashboard',

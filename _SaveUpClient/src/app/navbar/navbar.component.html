@@ -2,12 +2,13 @@
   <div class="container">
     <a class="navbar-brand" [routerLink]="['/']">
       <div class="logo-container">
-        <!-- Logo placeholder - Replace this img src with your logo in the future -->
-        <img src="assets/logo.png" alt="Gym Progress Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="logo-placeholder" style="display: none;">
-          <i class="bi bi-activity"></i>
+        <div class="logo-mark">
+          <img src="assets/logo.png" alt="PeakLift Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="logo-placeholder" style="display: none;">
+            <i class="bi bi-activity"></i>
+          </div>
         </div>
-        <span class="logo-text">GymProgress</span>
+        <span class="logo-text">PeakLift</span>
       </div>
     </a>
     
@@ -57,15 +58,15 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <li>
-              <a class="dropdown-item" [routerLink]="['/profile']">
+              <a class="dropdown-item" (click)="goToProfile()">
                 <i class="bi bi-person me-2"></i>My Profile
               </a>
             </li>
-            <li>
+            <!-- <li>
               <a class="dropdown-item" [routerLink]="['/settings']">
                 <i class="bi bi-gear me-2"></i>Settings
               </a>
-            </li>
+            </li> -->
             <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item theme-toggle-item" (click)="toggleTheme()">
@@ -87,7 +88,7 @@
           </button>
         </li>
         <li class="nav-item" *ngIf="!authenticated">
-          <button class="btn btn-primary btn-sm" (click)="login()">
+          <button class="btn btn-primary btn-sm" (click)="register()">
             <i class="bi bi-person-plus me-1"></i>Sign Up
           </button>
         </li>

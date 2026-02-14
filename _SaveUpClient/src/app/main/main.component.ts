@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_auth/auth.service';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -10,11 +10,28 @@ import { CommonModule } from '@angular/common';
   styleUrl: './main.component.css'
 })
 export class MainComponent implements OnInit {
+  currentYear = new Date().getFullYear();
 
-  constructor(public authService: AuthService, private http: HttpClient) {
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-  
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  navigateToApp() {
+    if (this.authService.isLoggedIn() && this.authService.isUser()) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.authService.login();
+    }
+  }
+
+  scrollToFeatures() {
+    const featuresElement = document.getElementById('features');
+    if (featuresElement) {
+      featuresElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 }

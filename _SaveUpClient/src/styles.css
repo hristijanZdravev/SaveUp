@@ -1,5 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  --brand-primary: #e05028;
+  --brand-primary-rgb: 224, 80, 40;
+  --brand-primary-soft: #e05028;
+  --bs-primary: var(--brand-primary);
+  --bs-primary-rgb: var(--brand-primary-rgb);
+  --bs-link-color: var(--brand-primary);
+  --bs-link-hover-color: #c94420;
+}
+
 /* Default to dark theme */
 html {
   scroll-behavior: smooth;
@@ -26,4 +36,31 @@ html.dark-theme body {
 html.light-theme,
 html.light-theme body {
   color: rgba(0, 0, 0, 0.85);
+}
+
+.text-primary {
+  color: var(--brand-primary) !important;
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #c94420;
+  border-color: #c94420;
+}
+
+.btn-outline-primary {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #fff;
 }

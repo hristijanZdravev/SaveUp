@@ -1,142 +1,130 @@
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center gap-3">
-        <!-- Title Section -->
+<div class="workouts-shell">
+  <div class="container py-4 py-md-5">
+    <section class="hero-panel mb-4 mb-md-5">
+      <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
         <div>
-          <h1 class="display-4 fw-bold">🏋️ Workouts</h1>
-          <p class="lead text-muted">Track and manage your workouts</p>
-        </div>
+          <p class="section-kicker mb-2">Session Manager</p>
+          <h1 class="display-4 fw-bold mb-2">Workouts</h1>
+          <p class="lead mb-0">Track, filter, duplicate, and organize your training sessions.</p>
 
-        <!-- Filter Bar -->
-        <div class="filter-container">
-          <div class="filter-label">Filter:</div>
-          <div class="filter-buttons">
-            <button 
-              *ngFor="let option of filterOptions"
-              type="button"
-              class="filter-btn"
-              [class.active]="selectedFilter === option.days"
-              (click)="onFilterChange(option.days)">
-              {{ option.label }}
-            </button>
+          <div class="filter-strip mt-3">
+            <div class="filter-container">
+              <div class="filter-label">Time Range</div>
+              <div class="filter-buttons">
+                <button
+                  *ngFor="let option of filterOptions"
+                  type="button"
+                  class="filter-btn"
+                  [class.active]="selectedFilter === option.days"
+                  (click)="onFilterChange(option.days)">
+                  {{ option.label }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- New Workout Button -->
         <button class="btn btn-primary btn-lg" (click)="openCreateModal()" [disabled]="loading">
           <i class="bi bi-plus-circle me-2"></i>New Workout
         </button>
       </div>
-    </div>
-  </div>
 
-  <!-- Error Message -->
-  <div class="row mb-3" *ngIf="error">
-    <div class="col-12">
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
-        <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+    </section>
+
+    <section *ngIf="error" class="mb-4">
+      <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+        <span><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</span>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="error = null">Dismiss</button>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Loading State -->
-  <div class="row" *ngIf="loading && workouts.length === 0">
-    <div class="col-12">
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-3 text-muted">Loading workouts...</p>
+    <section *ngIf="loading && workouts.length === 0" class="loading-panel text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-    </div>
-  </div>
+      <p class="mt-3 mb-0">Loading workouts...</p>
+    </section>
 
-  <!-- Workouts List -->
-  <div class="row g-4" *ngIf="!loading || workouts.length > 0">
-    <div class="col-12" *ngIf="workouts.length === 0 && !loading">
-      <div class="card empty-state-card">
-        <div class="card-body text-center py-5">
-          <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
-          <h3 class="mb-3">No workouts found</h3>
-          <p class="text-muted mb-4" *ngIf="selectedFilter === 0">Start by creating a new workout!</p>
-          <p class="text-muted mb-4" *ngIf="selectedFilter !== 0">No workouts in this period. Try a different filter or create a new one!</p>
-          <button class="btn btn-primary btn-lg" (click)="openCreateModal()">
-            <i class="bi bi-plus-circle me-2"></i>Create Your First Workout
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4" *ngFor="let workout of workouts">
-      <div class="card workout-card h-100" (click)="openWorkout(workout.id)">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="card-title mb-0">{{ workout.title }}</h5>
-            <button 
-              class="btn btn-sm btn-outline-danger delete-btn" 
-              (click)="deleteWorkout(workout.id, $event)"
-              title="Delete workout">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-          <p class="text-muted mb-0">
-            <i class="bi bi-calendar3 me-2"></i>{{ formatDate(workout.date) }}
-          </p>
-        </div>
-        <div class="card-footer">
-          <div class="d-flex justify-content-between align-items-center">
-            <small class="text-muted">
-              <i class="bi bi-arrow-right-circle me-1"></i>Click to view details
-            </small>
-            <button 
-              class="btn btn-sm btn-outline-primary copy-btn" 
-              (click)="copyWorkout(workout.id, $event)"
-              title="Copy workout">
-              <i class="bi bi-files me-1"></i>Copy
+    <section class="row g-4" *ngIf="!loading || workouts.length > 0">
+      <div class="col-12" *ngIf="workouts.length === 0 && !loading">
+        <div class="card empty-state-card">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
+            <h3 class="mb-3">No workouts found</h3>
+            <p class="text-muted mb-4" *ngIf="selectedFilter === 0">Start by creating a new workout.</p>
+            <p class="text-muted mb-4" *ngIf="selectedFilter !== 0">No workouts in this period. Try another filter.</p>
+            <button class="btn btn-primary btn-lg" (click)="openCreateModal()">
+              <i class="bi bi-plus-circle me-2"></i>Create Your First Workout
             </button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Pagination -->
-  <div class="row mt-5" *ngIf="getTotalPages() > 1">
-    <div class="col-12">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
-              <i class="bi bi-chevron-left me-1"></i>Previous
-            </button>
-          </li>
-
-          <li class="page-item" *ngFor="let page of [].constructor(getTotalPages()); let i = index" 
-              [class.active]="currentPage === (i + 1)">
-            <button class="page-link" (click)="goToPage(i + 1)" [disabled]="currentPage === (i + 1)">
-              {{ i + 1 }}
-            </button>
-          </li>
-
-          <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
-            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
-              Next<i class="bi bi-chevron-right ms-1"></i>
-            </button>
-          </li>
-        </ul>
-      </nav>
-      <div class="text-center text-muted">
-        <small>Page {{ currentPage }} of {{ getTotalPages() }} • Total: {{ totalWorkouts }} workouts</small>
+      <div class="col-md-6 col-lg-4" *ngFor="let workout of workouts">
+        <div class="card workout-card h-100" (click)="openWorkout(workout.id)">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5 class="card-title mb-0">{{ workout.title }}</h5>
+              <button
+                class="btn btn-sm btn-outline-danger delete-btn"
+                (click)="deleteWorkout(workout.id, $event)"
+                title="Delete workout">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <p class="text-muted mb-0">
+              <i class="bi bi-calendar3 me-2"></i>{{ formatDate(workout.date) }}
+            </p>
+          </div>
+          <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <i class="bi bi-arrow-right-circle me-1"></i>Click to view details
+              </small>
+              <button
+                class="btn btn-sm btn-outline-primary copy-btn"
+                (click)="copyWorkout(workout.id, $event)"
+                title="Copy workout">
+                <i class="bi bi-files me-1"></i>Copy
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="row mt-5" *ngIf="getTotalPages() > 1">
+      <div class="col-12">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-2">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="bi bi-chevron-left me-1"></i>Previous
+              </button>
+            </li>
+
+            <li class="page-item" *ngFor="let page of [].constructor(getTotalPages()); let i = index" [class.active]="currentPage === (i + 1)">
+              <button class="page-link" (click)="goToPage(i + 1)" [disabled]="currentPage === (i + 1)">
+                {{ i + 1 }}
+              </button>
+            </li>
+
+            <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+              <button class="page-link" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
+                Next<i class="bi bi-chevron-right ms-1"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <div class="text-center page-meta">
+          <small>Page {{ currentPage }} of {{ getTotalPages() }} - Total: {{ totalWorkouts }} workouts</small>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
-<!-- Create Workout Modal -->
-<div class="modal fade" [class.show]="showCreateModal" [style.display]="showCreateModal ? 'block' : 'none'" 
-     tabindex="-1" *ngIf="showCreateModal">
+<div class="modal fade" [class.show]="showCreateModal" [style.display]="showCreateModal ? 'block' : 'none'" tabindex="-1" *ngIf="showCreateModal">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -147,10 +135,10 @@
         <form (ngSubmit)="createWorkout()">
           <div class="mb-3">
             <label for="workoutTitle" class="form-label">Workout Title</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="workoutTitle" 
+            <input
+              type="text"
+              class="form-control"
+              id="workoutTitle"
               [(ngModel)]="newWorkoutTitle"
               name="workoutTitle"
               placeholder="e.g., Push Day, Leg Day"
@@ -158,10 +146,10 @@
           </div>
           <div class="mb-3">
             <label for="workoutDate" class="form-label">Date</label>
-            <input 
-              type="date" 
-              class="form-control" 
-              id="workoutDate" 
+            <input
+              type="date"
+              class="form-control"
+              id="workoutDate"
               [(ngModel)]="newWorkoutDate"
               name="workoutDate"
               required>
@@ -179,10 +167,8 @@
   </div>
 </div>
 
-<!-- Modal Backdrop -->
 <div class="modal-backdrop fade" [class.show]="showCreateModal" *ngIf="showCreateModal" (click)="closeCreateModal()"></div>
 
-<!-- Confirm Delete Modal -->
 <app-confirm-delete
   [isOpen]="showDeleteConfirm"
   title="Delete Workout"

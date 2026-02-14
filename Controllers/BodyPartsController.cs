@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SaveUp.Data;
+using SaveUp.DTOs;
 
 namespace SaveUp.Controllers
 {
@@ -24,7 +25,15 @@ namespace SaveUp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _context.BodyGroups.ToListAsync());
+            var bodyParts = await _context.BodyGroups
+                .Select(b => new BodyPartDto
+                {
+                    Id = b.Id,
+                    Name = b.Name
+                })
+                .ToListAsync();
+
+            return Ok(bodyParts);
         }
 
         [HttpGet("{id}/stats")]
@@ -32,14 +41,16 @@ namespace SaveUp.Controllers
         {
             var userId = GetUserId();
 
-            var totalSets = await _context.WorkoutSets
-                .Where(s =>
-                    s.WorkoutExercise.Workout.UserId == userId &&
-                    s.WorkoutExercise.Exercise.BodyGroupId == id)
-                .CountAsync();
+            var dto = new BodyPartStatsDto
+            {
+                TotalSets = await _context.WorkoutSets
+                    .Where(s =>
+                        s.WorkoutExercise.Workout.UserId == userId &&
+                        s.WorkoutExercise.Exercise.BodyGroupId == id)
+                    .CountAsync()
+            };
 
-            return Ok(new { totalSets });
+            return Ok(dto);
         }
     }
-
 }

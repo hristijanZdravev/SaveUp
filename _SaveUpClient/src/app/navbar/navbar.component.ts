@@ -56,7 +56,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authenticated = this.authService.isLoggedIn();
     if (this.authenticated) {
       try {
-        this.userName = this.authService.userName || 'User';
+        const rawName = this.authService.userName || 'User';
+        this.userName = rawName.split('@')[0] || 'User';
       } catch (error) {
         this.userName = 'User';
       }
@@ -69,6 +70,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authService.login();
   }
 
+  register() {
+    this.authService.register();
+  }
+  goToProfile() {
+    this.authService.goToProfile();
+  }
   logout() {
     this.authService.logout();
   }

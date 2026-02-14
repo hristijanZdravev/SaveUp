@@ -1,18 +1,151 @@
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12">
-      <h1 class="display-4 fw-bold">Progress</h1>
-      <p class="lead text-muted">View your fitness progress and improvements</p>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <p class="text-muted">Progress charts and statistics will appear here as you log workouts.</p>
+<div class="progress-shell">
+  <div class="container py-4 py-md-5">
+    <section class="hero-panel mb-4 mb-md-5">
+      <p class="section-kicker mb-2">Training Analytics</p>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div>
+          <h1 class="display-4 fw-bold mb-2">Progress</h1>
+          <p class="lead mb-0">Track consistency, body-part focus, and long-term momentum.</p>
+          <div class="filter-strip mt-3">
+            <div class="filter-container">
+              <div class="filter-label">Time Range</div>
+              <div class="filter-buttons">
+                <button
+                  type="button"
+                  class="filter-btn"
+                  *ngFor="let option of rangeOptions"
+                  [class.active]="selectedDays === option.value"
+                  (click)="onRangeChange(option.value)">
+                  {{ option.label }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+        <button class="btn btn-primary" (click)="loadProgress()">Refresh Data</button>
       </div>
-    </div>
+   </section>
+
+    <section *ngIf="error" class="mb-4">
+      <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ error }}</span>
+        <button class="btn btn-sm btn-outline-danger" (click)="loadProgress()">Retry</button>
+      </div>
+    </section>
+
+    <section *ngIf="loading" class="loading-panel text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-3 mb-0">Loading progress analytics...</p>
+    </section>
+
+    <ng-container *ngIf="!loading && !error && summary">
+      <section class="row g-3 g-md-4 mb-4 mb-md-5">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <article class="metric-card">
+            <p class="metric-label mb-1">Total Workouts</p>
+            <p class="metric-value mb-0">{{ summary.totalWorkouts }}</p>
+          </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <article class="metric-card">
+            <p class="metric-label mb-1">Total Sets</p>
+            <p class="metric-value mb-0">{{ summary.totalSets }}</p>
+          </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <article class="metric-card">
+            <p class="metric-label mb-1">Total Reps</p>
+            <p class="metric-value mb-0">{{ formatVolume(summary.totalVolume) }}</p>
+          </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <article class="metric-card">
+            <p class="metric-label mb-1">Avg Reps / Set</p>
+            <p class="metric-value mb-0">{{ formatDecimal(avgRepsPerSet) }}</p>
+          </article>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3" *ngIf="selectedDays > 0">
+          <article class="metric-card">
+            <p class="metric-label mb-1">Consistency Score</p>
+            <p class="metric-value mb-0">{{ formatDecimal(consistencyScore) }}%</p>
+            <p class="panel-sub mb-0 mt-1">{{ activeDays }} active days</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="row g-4 mb-4 mb-md-5">
+        <div class="col-12 col-lg-7">
+          <article class="panel-card h-100">
+            <h2 class="h4 mb-3">Sets Per Day</h2>
+            <p class="panel-sub mb-2">Last {{ frequencyChart.length }} tracked days</p>
+            <p class="panel-sub mb-3">Avg sets/workout: {{ formatDecimal(avgSetsPerWorkout) }}</p>
+
+            <div *ngIf="frequencyChart.length === 0" class="empty-state text-center py-4">
+              No frequency data yet.
+            </div>
+
+            <div *ngIf="frequencyChart.length > 0" class="frequency-chart">
+              <div class="bar-column" *ngFor="let point of frequencyChart">
+                <div class="bar-value">{{ point.count }}</div>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.height.%]="point.heightPercent"></div>
+                </div>
+                <div class="bar-label">{{ point.label }}</div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="col-12 col-lg-5">
+          <article class="panel-card h-100">
+            <h2 class="h4 mb-3">Body Part Distribution</h2>
+
+            <div *ngIf="distributionChart.length === 0" class="empty-state text-center py-4">
+              No distribution data yet.
+            </div>
+
+            <div *ngIf="distributionChart.length > 0" class="distribution-list">
+              <div class="distribution-item" *ngFor="let item of distributionChart">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>{{ item.label }}</span>
+                  <span>{{ item.count }}</span>
+                </div>
+                <div class="progress-rail">
+                  <div class="progress-fill" [style.width.%]="item.widthPercent"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <article class="panel-card">
+          <h2 class="h4 mb-3">Body Part Set Volume</h2>
+          <p class="panel-sub mb-3">Tracked sets across all body groups: {{ totalTrackedSets }}</p>
+
+          <div *ngIf="bodyPartProgress.length === 0" class="empty-state text-center py-4">
+            No body-part progress data yet.
+          </div>
+
+          <div *ngIf="bodyPartProgress.length > 0" class="body-part-grid">
+            <div class="body-part-item" *ngFor="let item of bodyPartProgress">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <p class="body-part-name mb-0">{{ item.name }}</p>
+                <p class="body-part-sets mb-0">{{ item.totalSets }} sets</p>
+              </div>
+              <div class="progress-rail">
+                <div class="progress-fill" [style.width.%]="bodyPartPercentage(item.totalSets)"></div>
+              </div>
+              <p class="body-part-share mb-0">{{ bodyPartPercentage(item.totalSets) }}% of all tracked sets</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </ng-container>
   </div>
 </div>

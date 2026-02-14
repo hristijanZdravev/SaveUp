@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ExerciseSearchResult, ExerciseService } from '../../../_services/exercise.service';
-import { AddSetRequest, Exercise, UpdateSetRequest, WorkoutDetails, WorkoutService, Set } from '../../../_services/workout.service';
+import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil } from 'rxjs';
+import { WorkoutService, WorkoutDetails, Exercise, Set, AddSetRequest, UpdateSetRequest } from '../../../_services/workout.service';
+import { ExerciseService } from '../../../_services/exercise.service';
 import { ConfirmDeleteComponent } from '../../../common/confirm-delete/confirm-delete.component';
 
 @Component({
@@ -16,24 +16,22 @@ import { ConfirmDeleteComponent } from '../../../common/confirm-delete/confirm-d
 export class WorkoutDetailComponent implements OnInit, OnDestroy {
   workout: WorkoutDetails | null = null;
   exercises: Exercise[] = [];
+  filteredExercises: Exercise[] = [];
+  exerciseQuery = '';
+  exerciseSearchLoading = false;
   loading = false;
   error: string | null = null;
   showAddExerciseModal = false;
   selectedExerciseId = '';
-  editingSetId: string | null = null;
-  editingSet: { reps: number; weight: number } | null = null;
-  
-  // Delete confirmation modal
-  showDeleteConfirm = false;
+  showExerciseDeleteConfirm = false;
   deleteExerciseId: string | null = null;
   deleteExerciseTitle: string | null = null;
-  
-  // Exercise search properties
-  searchQuery = '';
-  searchResults: ExerciseSearchResult[] = [];
-  showSearchResults = false;
-  searching = false;
-  private searchSubject$ = new Subject<string>();
+  showSetDeleteConfirm = false;
+  deleteSetId: string | null = null;
+  deleteSetLabel: string | null = null;
+  editingSetId: string | null = null;
+  editingSet: { reps: number; weight: number } | null = null;
+  private exerciseSearch$ = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -44,27 +42,12 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.setupExerciseSearch();
     const workoutId = this.route.snapshot.paramMap.get('id');
     if (workoutId) {
       this.loadWorkoutDetails(workoutId);
+      this.loadExercises();
     }
-    
-    // Setup search debounce with faster response
-    this.searchSubject$
-      .pipe(
-        debounceTime(150),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((query) => {
-        if (query.trim().length > 0) {
-          this.performSearch(query);
-        } else {
-          this.searchResults = [];
-          this.showSearchResults = false;
-          this.searching = false;
-        }
-      });
   }
 
   ngOnDestroy() {
@@ -90,37 +73,20 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearchChange(query: string) {
-    this.searchQuery = query;
-    // Show loading state immediately for better UX feedback
-    if (query.trim().length > 0) {
-      this.searching = true;
-    }
-    this.searchSubject$.next(query);
-  }
-
-  performSearch(query: string) {
-    this.searching = true;
-    this.exerciseService.searchExercises(query)
+  loadExercises() {
+    this.workoutService.getAllExercises()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (results: ExerciseSearchResult[]) => {
-          this.searchResults = results;
-          this.showSearchResults = results.length > 0;
-          this.searching = false;
+        next: (exercises) => {
+          this.exercises = exercises;
+          if (!this.exerciseQuery.trim()) {
+            this.filteredExercises = exercises;
+          }
         },
-        error: (err: any) => {
-          console.error('Error searching exercises:', err);
-          this.searchResults = [];
-          this.showSearchResults = false;
-          this.searching = false;
+        error: (err) => {
+          console.error('Error loading exercises:', err);
         }
       });
-  }
-
-  selectExercise(exerciseId: string) {
-    this.selectedExerciseId = exerciseId;
-    this.addExercise();
   }
 
   goBack() {
@@ -130,17 +96,24 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   openAddExerciseModal() {
     this.showAddExerciseModal = true;
     this.selectedExerciseId = '';
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.showSearchResults = false;
+    this.exerciseQuery = '';
+    this.filteredExercises = this.exercises;
   }
 
   closeAddExerciseModal() {
     this.showAddExerciseModal = false;
     this.selectedExerciseId = '';
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.showSearchResults = false;
+    this.exerciseQuery = '';
+    this.exerciseSearchLoading = false;
+    this.filteredExercises = this.exercises;
+  }
+
+  selectExercise(exerciseId: string) {
+    this.selectedExerciseId = exerciseId;
+  }
+
+  onExerciseQueryChange() {
+    this.exerciseSearch$.next(this.exerciseQuery);
   }
 
   addExercise() {
@@ -164,22 +137,40 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  removeExercise(workoutExerciseId: string) {
-    if (confirm('Are you sure you want to remove this exercise from the workout?')) {
-      this.loading = true;
-      this.workoutService.removeExerciseFromWorkout(workoutExerciseId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.loadWorkoutDetails(this.workout!.id);
-          },
-          error: (err) => {
-            console.error('Error removing exercise:', err);
-            this.error = 'Failed to remove exercise. Please try again.';
-            this.loading = false;
-          }
-        });
-    }
+  removeExercise(workoutExerciseId: string, exerciseTitle: string) {
+    this.deleteExerciseId = workoutExerciseId;
+    this.deleteExerciseTitle = exerciseTitle;
+    this.showExerciseDeleteConfirm = true;
+  }
+
+  onExerciseDeleteConfirm() {
+    if (!this.deleteExerciseId || !this.workout) return;
+
+    this.loading = true;
+    this.workoutService.removeExerciseFromWorkout(this.deleteExerciseId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showExerciseDeleteConfirm = false;
+          this.deleteExerciseId = null;
+          this.deleteExerciseTitle = null;
+          this.loadWorkoutDetails(this.workout!.id);
+        },
+        error: (err) => {
+          console.error('Error removing exercise:', err);
+          this.error = 'Failed to remove exercise. Please try again.';
+          this.loading = false;
+          this.showExerciseDeleteConfirm = false;
+          this.deleteExerciseId = null;
+          this.deleteExerciseTitle = null;
+        }
+      });
+  }
+
+  onExerciseDeleteCancel() {
+    this.showExerciseDeleteConfirm = false;
+    this.deleteExerciseId = null;
+    this.deleteExerciseTitle = null;
   }
 
   openAddSetModal(workoutExerciseId: string) {
@@ -190,16 +181,8 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       ? Math.max(...workoutExercise.sets.map(s => s.setNumber)) + 1 
       : 1;
 
-    // Get the last set's reps and weight if it exists
-    const lastSet = workoutExercise.sets.length > 0 
-      ? workoutExercise.sets[workoutExercise.sets.length - 1]
-      : null;
-
     this.editingSetId = workoutExerciseId;
-    this.editingSet = { 
-      reps: lastSet ? lastSet.reps : 10,
-      weight: lastSet ? lastSet.weight : 0
-    };
+    this.editingSet = { reps: 10, weight: 0 };
     (this.editingSet as any).setNumber = nextSetNumber;
     (this.editingSet as any).workoutExerciseId = workoutExerciseId;
   }
@@ -267,22 +250,40 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  deleteSet(setId: string) {
-    if (confirm('Are you sure you want to delete this set?')) {
-      this.loading = true;
-      this.workoutService.deleteSet(setId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.loadWorkoutDetails(this.workout!.id);
-          },
-          error: (err) => {
-            console.error('Error deleting set:', err);
-            this.error = 'Failed to delete set. Please try again.';
-            this.loading = false;
-          }
-        });
-    }
+  deleteSet(setId: string, setNumber: number) {
+    this.deleteSetId = setId;
+    this.deleteSetLabel = `Set ${setNumber}`;
+    this.showSetDeleteConfirm = true;
+  }
+
+  onSetDeleteConfirm() {
+    if (!this.deleteSetId || !this.workout) return;
+
+    this.loading = true;
+    this.workoutService.deleteSet(this.deleteSetId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showSetDeleteConfirm = false;
+          this.deleteSetId = null;
+          this.deleteSetLabel = null;
+          this.loadWorkoutDetails(this.workout!.id);
+        },
+        error: (err) => {
+          console.error('Error deleting set:', err);
+          this.error = 'Failed to delete set. Please try again.';
+          this.loading = false;
+          this.showSetDeleteConfirm = false;
+          this.deleteSetId = null;
+          this.deleteSetLabel = null;
+        }
+      });
+  }
+
+  onSetDeleteCancel() {
+    this.showSetDeleteConfirm = false;
+    this.deleteSetId = null;
+    this.deleteSetLabel = null;
   }
 
   formatDate(dateString: string): string {
@@ -307,5 +308,42 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       return 1;
     }
     return Math.max(...sets.map(s => s.setNumber)) + 1;
+  }
+
+  trackByExerciseId(index: number, exercise: Exercise): string {
+    return exercise.id;
+  }
+
+  private setupExerciseSearch() {
+    this.exerciseSearch$
+      .pipe(
+        debounceTime(220),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          const normalizedQuery = query.trim();
+
+          if (!normalizedQuery) {
+            this.exerciseSearchLoading = false;
+            return of(this.exercises);
+          }
+
+          this.exerciseSearchLoading = true;
+          return this.exerciseService.searchExercises(normalizedQuery).pipe(
+            switchMap((results) => of(results as Exercise[])),
+            catchError((err) => {
+              console.error('Error searching exercises:', err);
+              const fallback = this.exercises.filter((exercise) =>
+                exercise.title.toLowerCase().includes(normalizedQuery.toLowerCase())
+              );
+              return of(fallback);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((results) => {
+        this.filteredExercises = results;
+        this.exerciseSearchLoading = false;
+      });
   }
 }

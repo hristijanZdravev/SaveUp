@@ -3,14 +3,15 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { KeycloakAngularModule, KeycloakBearerInterceptor, KeycloakService } from 'keycloak-angular';
+import { environment } from '../environments/environment';
 
 function initializeKeycloak(keycloak: KeycloakService)  {
     return () =>
       keycloak.init({
         config: {
-          url: 'http://localhost:8080',
-          realm: 'gym-realm',
-          clientId: 'GymClient',
+          url: environment.keycloakUrl,
+          realm: environment.keycloakRealm,
+          clientId: environment.keycloakClientId,
         },
         initOptions: {
           onLoad: 'check-sso',
