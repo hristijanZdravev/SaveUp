@@ -34,9 +34,21 @@ services:
       - "1433:1433"
   keycloak:
       image: quay.io/keycloak/keycloak:26.0.5
+      depends_on: 
+        - sqlserver
       environment:
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
-      entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev"]
+        KC_DB: mssql
+        KC_DB_URL: jdbc:sqlserver://sqlserver:1433;databaseName=keycloak;encrypt=false;trustServerCertificate=true
+        KC_DB_USERNAME: sa
+        KC_DB_PASSWORD: Your_password123
       ports:
         - 8080:8080
+      volumes:
+        - ./_SaveUpClient/themes:/opt/keycloak/themes
+      command:
+        - start-dev
+        - --spi-theme-cache-themes=false
+        - --spi-theme-cache-templates=false
+        - --spi-theme-static-max-age=-1

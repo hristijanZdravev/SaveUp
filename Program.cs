@@ -1,9 +1,11 @@
-﻿
+﻿using CloudinaryDotNet;
+using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SaveUp.Data;
+using SaveUp.Services;
 using static SaveUp.Data.ModelBuilderExtensions;
 
 namespace SaveUp
@@ -115,6 +117,15 @@ namespace SaveUp
                     }
                 };
             });
+
+            DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+
+            var cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            cloudinary.Api.Secure = true;
+
+            // register in DI
+            builder.Services.AddSingleton(cloudinary);
+            builder.Services.AddScoped<CloudinaryService>();
 
             var app = builder.Build();
 

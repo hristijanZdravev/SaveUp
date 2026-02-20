@@ -10,7 +10,7 @@
         public Guid ExerciseId { get; set; }
         public Exercise Exercise { get; set; } = null!;
 
-        public int Order { get; set; } // exercise order in workout
+        public int Order { get; set; } 
 
         public string? Notes { get; set; }
 

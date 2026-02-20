@@ -14,9 +14,18 @@
             <span>{{ workout.workoutExercises.length }} exercises</span>
           </p>
         </div>
-        <button class="btn btn-primary btn-lg" (click)="openAddExerciseModal()" [disabled]="loading">
-          <i class="bi bi-plus-circle me-2"></i>Add Exercise
-        </button>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            class="btn btn-outline-secondary btn-lg"
+            (click)="toggleCollapseExpandAction()"
+            [disabled]="loading || !workout.workoutExercises.length">
+            <i class="bi me-2" [ngClass]="showExpandAllAction ? 'bi-arrows-expand' : 'bi-arrows-collapse'"></i>
+            {{ showExpandAllAction ? 'Expand All' : 'Collapse All' }}
+          </button>
+          <button class="btn btn-primary btn-lg" (click)="openAddExerciseModal()" [disabled]="loading">
+            <i class="bi bi-plus-circle me-2"></i>Add Exercise
+          </button>
+        </div>
       </div>
     </section>
 
@@ -49,21 +58,58 @@
       </div>
     </section>
 
-    <section class="row g-4" *ngIf="workout.workoutExercises.length > 0">
-      <div class="col-12 col-lg-6" *ngFor="let workoutExercise of workout.workoutExercises">
-        <div class="card exercise-card">
+    <section class="row g-4 justify-content-start" *ngIf="workout.workoutExercises.length > 0">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let workoutExercise of workout.workoutExercises">
+        <div
+          class="card exercise-card"
+          draggable="true"
+          [class.dragging]="draggedExerciseId === workoutExercise.id"
+          [class.drag-over]="dragOverExerciseId === workoutExercise.id"
+          (dragstart)="onExerciseDragStart(workoutExercise.id, $event)"
+          (dragover)="onExerciseDragOver(workoutExercise.id, $event)"
+          (dragleave)="onExerciseDragLeave(workoutExercise.id)"
+          (drop)="onExerciseDrop(workoutExercise.id, $event)"
+          (dragend)="onExerciseDragEnd()">
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">
-                <i class="bi bi-activity me-2 text-primary"></i>{{ workoutExercise.exerciseTitle }}
+              <h5 class="mb-0 exercise-card-title">
+                <ng-container *ngIf="getNormalizedExerciseImageUrl(getExerciseImageUrl(workoutExercise.exerciseId)) as exerciseImage; else exerciseCardFallback">
+                  <img
+                    class="exercise-thumb"
+                    [src]="exerciseImage"
+                    [alt]="workoutExercise.exerciseTitle"
+                    loading="lazy">
+                </ng-container>
+                <ng-template #exerciseCardFallback>
+                  <span class="exercise-thumb-fallback" aria-hidden="true">
+                    <i class="bi bi-activity"></i>
+                  </span>
+                </ng-template>
+                <span class="exercise-title-wrap">
+                  <span class="exercise-name">{{ workoutExercise.exerciseTitle }}</span>
+                  <small class="exercise-meta">
+                    {{ workoutExercise.sets.length }} set{{ workoutExercise.sets.length === 1 ? '' : 's' }} logged
+                  </small>
+                  <small class="exercise-drag-hint">Drag to reorder</small>
+                </span>
               </h5>
-              <button class="btn btn-sm btn-outline-danger" (click)="removeExercise(workoutExercise.id, workoutExercise.exerciseTitle)" title="Remove exercise">
-                <i class="bi bi-trash"></i>
-              </button>
+              <div class="exercise-card-actions">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="toggleExerciseCollapsed(workoutExercise.id)"
+                  [title]="isExerciseCollapsed(workoutExercise.id) ? 'Expand exercise' : 'Collapse exercise'">
+                  <i class="bi" [ngClass]="isExerciseCollapsed(workoutExercise.id) ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="removeExercise(workoutExercise.id, workoutExercise.exerciseTitle)" title="Remove exercise">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <div class="card-body">
-            <div class="table-responsive">
+          <div class="card-body" *ngIf="!isExerciseCollapsed(workoutExercise.id)">
+            <div
+              class="table-responsive exercise-table-wrap"
+              [class.scroll-enabled]="workoutExercise.sets.length > 3">
               <table class="table table-hover">
                 <thead>
                   <tr>
@@ -81,10 +127,10 @@
                     <td *ngIf="isEditingSet(set.id)" colspan="2">
                       <div class="row g-2">
                         <div class="col-5">
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
+                          <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
                         </div>
                         <div class="col-5">
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
+                          <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
                         </div>
                         <div class="col-2">
                           <button class="btn btn-sm btn-success" (click)="updateSet()">
@@ -105,31 +151,26 @@
                     </td>
                   </tr>
 
-                  <tr *ngIf="isAddingSet(workoutExercise.id)">
-                    <td>{{ getNextSetNumber(workoutExercise.sets) }}</td>
-                    <td colspan="2">
-                      <div class="row g-2">
-                        <div class="col-5">
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
-                        </div>
-                        <div class="col-5">
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
-                        </div>
-                        <div class="col-2">
-                          <button class="btn btn-sm btn-success" (click)="addSet()">
-                            <i class="bi bi-check"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <button class="btn btn-sm btn-secondary" (click)="closeAddSetModal()">
-                        <i class="bi bi-x"></i>
-                      </button>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="add-set-dock" *ngIf="isAddingSet(workoutExercise.id)">
+              <div class="add-set-dock-label">
+                <span class="set-chip">Set {{ getNextSetNumber(workoutExercise.sets) }}</span>
+              </div>
+              <div class="add-set-dock-fields">
+                <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
+                <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
+              </div>
+              <div class="add-set-dock-actions">
+                <button class="btn btn-sm btn-success" (click)="addSet()">
+                  <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="closeAddSetModal()">
+                  <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+              </div>
             </div>
 
             <button class="btn btn-outline-primary btn-sm mt-2" (click)="openAddSetModal(workoutExercise.id)" *ngIf="!isAddingSet(workoutExercise.id)">
@@ -175,7 +216,21 @@
             *ngFor="let exercise of filteredExercises; trackBy: trackByExerciseId"
             [class.active]="selectedExerciseId === exercise.id"
             (click)="selectExercise(exercise.id)">
-            <span class="exercise-title">{{ exercise.title }}</span>
+            <span class="exercise-result-main">
+              <ng-container *ngIf="exercise.imageUrl; else exerciseSearchFallback">
+                <img
+                  class="exercise-result-thumb"
+                  [src]="getNormalizedExerciseImageUrl(exercise.imageUrl) || ''"
+                  [alt]="exercise.title"
+                  loading="lazy">
+              </ng-container>
+              <ng-template #exerciseSearchFallback>
+                <span class="exercise-result-thumb-fallback" aria-hidden="true">
+                  <i class="bi bi-activity"></i>
+                </span>
+              </ng-template>
+              <span class="exercise-title">{{ exercise.title }}</span>
+            </span>
             <span class="exercise-group" *ngIf="exercise.bodyGroup">{{ exercise.bodyGroup.name }}</span>
           </button>
           <div class="exercise-empty" *ngIf="filteredExercises.length === 0">

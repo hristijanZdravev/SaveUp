@@ -6,6 +6,8 @@ import { environment } from '../../environments/environment';
 export interface ExerciseSearchResult {
   id: string;
   title: string;
+  imageUrl?: string | null;
+  imagePublicId?: string | null;
 }
 
 export interface ExerciseDetail extends ExerciseSearchResult {

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil } from 'rxjs';
-import { WorkoutService, WorkoutDetails, Exercise, Set, AddSetRequest, UpdateSetRequest } from '../../../_services/workout.service';
+import { WorkoutService, WorkoutDetails, WorkoutExercise, Exercise, Set as WorkoutSet, AddSetRequest, UpdateSetRequest } from '../../../_services/workout.service';
 import { ExerciseService } from '../../../_services/exercise.service';
 import { ConfirmDeleteComponent } from '../../../common/confirm-delete/confirm-delete.component';
 
@@ -31,8 +31,15 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   deleteSetLabel: string | null = null;
   editingSetId: string | null = null;
   editingSet: { reps: number; weight: number } | null = null;
+  draggedExerciseId: string | null = null;
+  dragOverExerciseId: string | null = null;
+  reordering = false;
+  collapsedExerciseIds = new Set<string>();
+  showExpandAllAction = false;
   private exerciseSearch$ = new Subject<string>();
   private destroy$ = new Subject<void>();
+  private exerciseImageMap: Record<string, string> = {};
+  private normalizedImageUrlMap: Record<string, string> = {};
 
   constructor(
     private workoutService: WorkoutService,
@@ -62,6 +69,10 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (workout) => {
+          const nextIds = new Set(workout.workoutExercises.map((x) => x.id));
+          this.collapsedExerciseIds = new Set(
+            [...this.collapsedExerciseIds].filter((id) => nextIds.has(id))
+          );
           this.workout = workout;
           this.loading = false;
         },
@@ -79,6 +90,13 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (exercises) => {
           this.exercises = exercises;
+          this.exerciseImageMap = exercises.reduce((acc, exercise) => {
+            if (exercise.imageUrl) {
+              acc[exercise.id] = exercise.imageUrl;
+            }
+            return acc;
+          }, {} as Record<string, string>);
+
           if (!this.exerciseQuery.trim()) {
             this.filteredExercises = exercises;
           }
@@ -195,10 +213,18 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   addSet() {
     if (!this.editingSet || !this.editingSetId) return;
 
+    const repsValue = Number(this.editingSet.reps);
+    const weightValue = Number(this.editingSet.weight);
+
+    if (!this.isValidSetInputs(repsValue, weightValue)) {
+      this.error = 'Reps must be a number greater than 0, and weight must be a valid number.';
+      return;
+    }
+
     const request: AddSetRequest = {
       setNumber: (this.editingSet as any).setNumber,
-      reps: this.editingSet.reps,
-      weight: this.editingSet.weight
+      reps: repsValue,
+      weight: weightValue
     };
 
     this.loading = true;
@@ -217,7 +243,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  startEditSet(set: Set, workoutExerciseId: string) {
+  startEditSet(set: WorkoutSet, workoutExerciseId: string) {
     this.editingSetId = workoutExerciseId;
     this.editingSet = { reps: set.reps, weight: set.weight };
     (this.editingSet as any).setId = set.id;
@@ -229,9 +255,17 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     const setId = (this.editingSet as any).setId;
     if (!setId) return;
 
+    const repsValue = Number(this.editingSet.reps);
+    const weightValue = Number(this.editingSet.weight);
+
+    if (!this.isValidSetInputs(repsValue, weightValue)) {
+      this.error = 'Reps must be a number greater than 0, and weight must be a valid number.';
+      return;
+    }
+
     const request: UpdateSetRequest = {
-      reps: this.editingSet.reps,
-      weight: this.editingSet.weight
+      reps: repsValue,
+      weight: weightValue
     };
 
     this.loading = true;
@@ -303,7 +337,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     return this.editingSetId === workoutExerciseId && !(this.editingSet as any)?.setId;
   }
 
-  getNextSetNumber(sets: Set[]): number {
+  getNextSetNumber(sets: WorkoutSet[]): number {
     if (sets.length === 0) {
       return 1;
     }
@@ -312,6 +346,196 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
 
   trackByExerciseId(index: number, exercise: Exercise): string {
     return exercise.id;
+  }
+
+  getExerciseImageUrl(exerciseId: string): string | null {
+    return this.exerciseImageMap[exerciseId] ?? null;
+  }
+
+  onExerciseDragStart(workoutExerciseId: string, event: DragEvent): void {
+    if (this.reordering) {
+      event.preventDefault();
+      return;
+    }
+
+    this.draggedExerciseId = workoutExerciseId;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', workoutExerciseId);
+    }
+  }
+
+  onExerciseDragOver(targetWorkoutExerciseId: string, event: DragEvent): void {
+    if (!this.draggedExerciseId || this.draggedExerciseId === targetWorkoutExerciseId) {
+      return;
+    }
+    event.preventDefault();
+    this.dragOverExerciseId = targetWorkoutExerciseId;
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onExerciseDragLeave(targetWorkoutExerciseId: string): void {
+    if (this.dragOverExerciseId === targetWorkoutExerciseId) {
+      this.dragOverExerciseId = null;
+    }
+  }
+
+  onExerciseDrop(targetWorkoutExerciseId: string, event: DragEvent): void {
+    event.preventDefault();
+    const sourceWorkoutExerciseId = this.draggedExerciseId || event.dataTransfer?.getData('text/plain') || null;
+    this.dragOverExerciseId = null;
+
+    if (!sourceWorkoutExerciseId || sourceWorkoutExerciseId === targetWorkoutExerciseId || !this.workout) {
+      this.draggedExerciseId = null;
+      return;
+    }
+
+    const currentExercises = [...this.workout.workoutExercises];
+    const sourceIndex = currentExercises.findIndex((x) => x.id === sourceWorkoutExerciseId);
+    const targetIndex = currentExercises.findIndex((x) => x.id === targetWorkoutExerciseId);
+
+    if (sourceIndex < 0 || targetIndex < 0) {
+      this.draggedExerciseId = null;
+      return;
+    }
+
+    const previousOrder = [...currentExercises];
+    const [movedItem] = currentExercises.splice(sourceIndex, 1);
+    currentExercises.splice(targetIndex, 0, movedItem);
+
+    this.workout = {
+      ...this.workout,
+      workoutExercises: currentExercises
+    };
+
+    this.persistWorkoutExerciseOrder(previousOrder);
+    this.draggedExerciseId = null;
+  }
+
+  onExerciseDragEnd(): void {
+    this.draggedExerciseId = null;
+    this.dragOverExerciseId = null;
+  }
+
+  isExerciseCollapsed(workoutExerciseId: string): boolean {
+    return this.collapsedExerciseIds.has(workoutExerciseId);
+  }
+
+  collapseAllExercises(): void {
+    if (!this.workout || this.workout.workoutExercises.length === 0) {
+      return;
+    }
+
+    this.collapsedExerciseIds = new Set(this.workout.workoutExercises.map((x) => x.id));
+    this.showExpandAllAction = true;
+  }
+
+  expandAllExercises(): void {
+    this.collapsedExerciseIds.clear();
+    this.showExpandAllAction = false;
+  }
+
+  toggleCollapseExpandAction(): void {
+    if (this.showExpandAllAction) {
+      this.expandAllExercises();
+      return;
+    }
+
+    this.collapseAllExercises();
+  }
+
+  toggleExerciseCollapsed(workoutExerciseId: string): void {
+    if (this.collapsedExerciseIds.has(workoutExerciseId)) {
+      this.collapsedExerciseIds.delete(workoutExerciseId);
+      return;
+    }
+
+    this.collapsedExerciseIds.add(workoutExerciseId);
+  }
+
+  getNormalizedExerciseImageUrl(imageUrl: string | null | undefined): string | null {
+    if (!imageUrl) {
+      return null;
+    }
+
+    if (this.normalizedImageUrlMap[imageUrl]) {
+      return this.normalizedImageUrlMap[imageUrl];
+    }
+
+    const normalizedUrl = this.normalizeCloudinaryToSquare(imageUrl);
+    this.normalizedImageUrlMap[imageUrl] = normalizedUrl;
+    return normalizedUrl;
+  }
+
+  private normalizeCloudinaryToSquare(imageUrl: string): string {
+    const [urlWithoutQuery, queryString] = imageUrl.split('?');
+
+    if (!urlWithoutQuery.includes('res.cloudinary.com') || !urlWithoutQuery.includes('/upload/')) {
+      return imageUrl;
+    }
+
+    const [prefix, suffix] = urlWithoutQuery.split('/upload/');
+    if (!prefix || !suffix) {
+      return imageUrl;
+    }
+
+    const transformation = 'c_pad,b_white,w_474,h_474,f_auto,q_auto';
+    const segments = suffix.split('/');
+    const firstSegment = segments[0] ?? '';
+
+    const isVersionSegment = /^v\d+$/.test(firstSegment);
+    const looksLikeTransformSegment =
+      firstSegment.includes(',') || /^[a-z]{1,3}_.+/.test(firstSegment);
+
+    const publicIdPath = looksLikeTransformSegment && !isVersionSegment
+      ? segments.slice(1).join('/')
+      : suffix;
+
+    if (!publicIdPath) {
+      return imageUrl;
+    }
+
+    const normalizedBase = `${prefix}/upload/${transformation}/${publicIdPath}`;
+    return queryString ? `${normalizedBase}?${queryString}` : normalizedBase;
+  }
+
+  private isValidSetInputs(reps: number, weight: number): boolean {
+    return Number.isFinite(reps) && reps > 0 && Number.isFinite(weight) && weight >= 0;
+  }
+
+  private persistWorkoutExerciseOrder(previousOrder: WorkoutExercise[]): void {
+    if (!this.workout) {
+      return;
+    }
+
+    const request = {
+      items: this.workout.workoutExercises.map((x, index) => ({
+        workoutExerciseId: x.id,
+        order: index + 1
+      }))
+    };
+
+    this.reordering = true;
+    this.workoutService.reorderWorkoutExercises(this.workout.id, request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.reordering = false;
+        },
+        error: (err) => {
+          console.error('Error reordering exercises:', err);
+          this.error = 'Failed to save exercise order. Please try again.';
+          if (this.workout) {
+            this.workout = {
+              ...this.workout,
+              workoutExercises: [...previousOrder]
+            };
+          }
+          this.reordering = false;
+        }
+      });
   }
 
   private setupExerciseSearch() {

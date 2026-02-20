@@ -6,7 +6,7 @@
 
         public string Title { get; set; } = null!;
         public string? Description { get; set; } = null!;
-        public string? ImageUrl { get; set; } = null!;
+        public string? ImagePublicId { get; set; } = null!;
 
         public Guid BodyGroupId { get; set; }
         public BodyGroup BodyGroup { get; set; } = null!;

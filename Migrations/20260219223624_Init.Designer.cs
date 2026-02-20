@@ -12,8 +12,8 @@ using SaveUp.Data;
 namespace SaveUp.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20260213195632_init")]
-    partial class init
+    [Migration("20260219223624_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace SaveUp.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("ImagePublicId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Backend DTOs matching the C# controller
@@ -13,7 +13,11 @@ export interface Workout {
 export interface Exercise {
   id: string;
   title: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  imagePublicId?: string | null;
   bodyGroup?: {
+    id?: string;
     name: string;
   };
 }
@@ -28,8 +32,11 @@ export interface Set {
 // Backend returns ExerciseTitle directly, not nested Exercise object
 export interface WorkoutExercise {
   id: string;
+  order?: number;
   exerciseId: string;
   exerciseTitle: string; // Changed from nested exercise object
+  imageUrl?: string | null;
+  imagePublicId?: string | null;
   sets: Set[];
 }
 
@@ -65,6 +72,15 @@ export interface UpdateSetRequest {
   weight: number;
 }
 
+export interface ReorderWorkoutExerciseItem {
+  workoutExerciseId: string;
+  order: number;
+}
+
+export interface ReorderWorkoutExercisesRequest {
+  items: ReorderWorkoutExerciseItem[];
+}
+
 export interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
@@ -98,7 +114,12 @@ export class WorkoutService {
 
   // Get workout details
   getWorkoutDetails(id: string): Observable<WorkoutDetails> {
-    return this.http.get<WorkoutDetails>(`${this.apiBaseUrl}/workouts/${id}`);
+    return this.http.get<WorkoutDetails & { exercises?: WorkoutExercise[] }>(`${this.apiBaseUrl}/workouts/${id}`).pipe(
+      map((dto) => ({
+        ...dto,
+        workoutExercises: dto.workoutExercises ?? dto.exercises ?? []
+      }))
+    );
   }
 
   // Create workout
@@ -146,6 +167,11 @@ export class WorkoutService {
     return this.http.delete<void>(
       `${this.apiBaseUrl}/workouts/exercises/${workoutExerciseId}`
     );
+  }
+
+  // Reorder exercises within a workout
+  reorderWorkoutExercises(workoutId: string, request: ReorderWorkoutExercisesRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiBaseUrl}/workouts/${workoutId}/reorder`, request);
   }
 
   // Delete workout

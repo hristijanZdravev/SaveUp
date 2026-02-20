@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "SaveUpClient": {
+    "PeakLift": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -79,10 +79,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "SaveUpClient:build:production"
+              "buildTarget": "PeakLift:build:production"
             },
             "development": {
-              "buildTarget": "SaveUpClient:build:development"
+              "buildTarget": "PeakLift:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -36,18 +36,18 @@ namespace SaveUp.Data
                 // EXERCISES (25)
                 // =========================
                 var exercises = new List<Exercise>
-            {
-                new() { Id=Guid.NewGuid(), Title="Bench Press", Description="Chest press", BodyGroupId=chest.Id },
-                new() { Id=Guid.NewGuid(), Title="Incline Dumbbell Press", Description="Upper chest", BodyGroupId=chest.Id },
-                new() { Id=Guid.NewGuid(), Title="Pull Ups", Description="Back", BodyGroupId=back.Id },
-                new() { Id=Guid.NewGuid(), Title="Lat Pulldown", Description="Back", BodyGroupId=back.Id },
-                new() { Id=Guid.NewGuid(), Title="Squat", Description="Legs", BodyGroupId=legs.Id },
-                new() { Id=Guid.NewGuid(), Title="Leg Press", Description="Legs", BodyGroupId=legs.Id },
-                new() { Id=Guid.NewGuid(), Title="Shoulder Press", Description="Shoulders", BodyGroupId=shoulders.Id },
-                new() { Id=Guid.NewGuid(), Title="Lateral Raise", Description="Shoulders", BodyGroupId=shoulders.Id },
-                new() { Id=Guid.NewGuid(), Title="Barbell Curl", Description="Biceps", BodyGroupId=arms.Id },
-                new() { Id=Guid.NewGuid(), Title="Tricep Pushdown", Description="Triceps", BodyGroupId=arms.Id }
-            };
+                {
+                    new() { Id=Guid.NewGuid(), Title="Bench Press", Description="Chest press", BodyGroupId=chest.Id, ImagePublicId="bench_press" },
+                    new() { Id=Guid.NewGuid(), Title="Incline Dumbbell Press", Description="Upper chest", BodyGroupId=chest.Id, ImagePublicId="incline_press" },
+                    new() { Id=Guid.NewGuid(), Title="Pull Ups", Description="Back", BodyGroupId=back.Id, ImagePublicId="pull_ups" },
+                    new() { Id=Guid.NewGuid(), Title="Lat Pulldown", Description="Back", BodyGroupId=back.Id, ImagePublicId="lat_pulldown" },
+                    new() { Id=Guid.NewGuid(), Title="Squat", Description="Legs", BodyGroupId=legs.Id, ImagePublicId="squat" },
+                    new() { Id=Guid.NewGuid(), Title="Leg Press", Description="Legs", BodyGroupId=legs.Id, ImagePublicId="leg_press" },
+                    new() { Id=Guid.NewGuid(), Title="Shoulder Press", Description="Shoulders", BodyGroupId=shoulders.Id, ImagePublicId="shoulder_press" },
+                    new() { Id=Guid.NewGuid(), Title="Lateral Raise", Description="Shoulders", BodyGroupId=shoulders.Id, ImagePublicId="lateral_raise" },
+                    new() { Id=Guid.NewGuid(), Title="Barbell Curl", Description="Biceps", BodyGroupId=arms.Id, ImagePublicId="barbell_curl" },
+                    new() { Id=Guid.NewGuid(), Title="Tricep Pushdown", Description="Triceps", BodyGroupId=arms.Id, ImagePublicId="tricep_pushdown" }
+                };
 
                 context.Exercises.AddRange(exercises);
 

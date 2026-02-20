@@ -1,0 +1,280 @@
+/* PeakLift Keycloak Account Theme
+   Covers account profile, security, sessions, applications and related views. */
+
+:root {
+  --peak-bg: #0a0a0a;
+  --peak-surface: rgba(16, 16, 16, 0.96);
+  --peak-surface-2: rgba(24, 24, 24, 0.95);
+  --peak-border: rgba(224, 80, 40, 0.28);
+  --peak-border-soft: rgba(224, 80, 40, 0.2);
+  --peak-text: rgba(255, 255, 255, 0.92);
+  --peak-subtext: rgba(255, 255, 255, 0.72);
+  --peak-muted: rgba(255, 255, 255, 0.58);
+  --peak-primary: #e05028;
+  --peak-primary-strong: #c94420;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(224, 80, 40, 0.14) 0%, transparent 36%),
+    radial-gradient(circle at 88% 0%, rgba(224, 80, 40, 0.12) 0%, transparent 30%),
+    var(--peak-bg) !important;
+  color: var(--peak-text) !important;
+}
+
+.pf-c-page,
+.pf-v5-c-page,
+.pf-c-page__main,
+.pf-v5-c-page__main {
+  background: transparent !important;
+}
+
+.pf-c-page__header,
+.pf-v5-c-page__header,
+.pf-c-masthead,
+.pf-v5-c-masthead {
+  background: linear-gradient(150deg, var(--peak-surface), var(--peak-surface-2)) !important;
+  border-bottom: 1px solid var(--peak-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Remove account header brand/logo area and user menu bubble/name */
+.pf-c-masthead__brand,
+.pf-v5-c-masthead__brand,
+.pf-c-page__header-brand,
+.pf-v5-c-page__header-brand,
+.pf-c-masthead__content > .pf-c-dropdown,
+.pf-v5-c-masthead__content > .pf-v5-c-dropdown,
+[data-testid="header-user-dropdown"],
+[data-testid="header-user-dropdown-toggle"] {
+  display: none !important;
+}
+
+/* Force-hide all top-right masthead controls for account console */
+.pf-c-masthead__content,
+.pf-v5-c-masthead__content,
+.pf-c-masthead__content .pf-c-toolbar,
+.pf-v5-c-masthead__content .pf-v5-c-toolbar,
+.pf-c-masthead__content .pf-c-toolbar__content,
+.pf-v5-c-masthead__content .pf-v5-c-toolbar__content,
+.pf-c-masthead__content .pf-c-toolbar__group,
+.pf-v5-c-masthead__content .pf-v5-c-toolbar__group,
+.pf-c-masthead__content .pf-c-toolbar__item,
+.pf-v5-c-masthead__content .pf-v5-c-toolbar__item,
+[data-testid*="masthead"] [data-testid*="dropdown"],
+[data-testid*="masthead"] [data-testid*="avatar"],
+[data-testid*="header-user"] {
+  display: none !important;
+}
+
+/* Remove "Applications" from side navigation and any direct links/cards */
+a[href*="/applications"],
+a[href$="/applications"],
+a[data-testid="applications"],
+[data-testid="nav-item-applications"] {
+  display: none !important;
+}
+
+li[id*="applications"],
+li[class*="applications"],
+[data-testid*="applications-nav"] {
+  display: none !important;
+}
+
+.pf-c-card,
+.pf-v5-c-card {
+  background: linear-gradient(150deg, var(--peak-surface), var(--peak-surface-2)) !important;
+  border: 1px solid var(--peak-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+  color: var(--peak-text) !important;
+}
+
+.pf-c-card__title,
+.pf-v5-c-card__title,
+.pf-c-title,
+.pf-v5-c-title,
+h1,
+h2,
+h3,
+h4 {
+  color: var(--peak-text) !important;
+}
+
+.pf-c-content,
+.pf-v5-c-content,
+p,
+small,
+.pf-c-helper-text,
+.pf-v5-c-helper-text {
+  color: var(--peak-subtext) !important;
+}
+
+input,
+select,
+textarea,
+.pf-c-form-control,
+.pf-v5-c-form-control {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  color: var(--peak-text) !important;
+  box-shadow: none !important;
+  background-image: none !important;
+  text-decoration: none !important;
+}
+
+input:hover,
+select:hover,
+textarea:hover,
+input:focus,
+select:focus,
+textarea:focus,
+.pf-c-form-control:hover,
+.pf-v5-c-form-control:hover,
+.pf-c-form-control:focus,
+.pf-v5-c-form-control:focus {
+  border-color: rgba(224, 80, 40, 0.7) !important;
+  border-bottom-color: rgba(224, 80, 40, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(224, 80, 40, 0.2) !important;
+}
+
+input::before,
+input::after,
+textarea::before,
+textarea::after,
+.pf-c-form-control::before,
+.pf-c-form-control::after,
+.pf-v5-c-form-control::before,
+.pf-v5-c-form-control::after {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--peak-muted) !important;
+}
+
+.pf-c-button,
+.pf-v5-c-button,
+.btn {
+  border-radius: 12px !important;
+}
+
+.pf-c-button.pf-m-primary,
+.pf-v5-c-button.pf-m-primary,
+button.pf-m-primary {
+  background: linear-gradient(135deg, var(--peak-primary) 0%, var(--peak-primary) 100%) !important;
+  border-color: var(--peak-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(224, 80, 40, 0.35) !important;
+}
+
+.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:focus,
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus {
+  background: linear-gradient(135deg, var(--peak-primary-strong) 0%, var(--peak-primary-strong) 100%) !important;
+  border-color: var(--peak-primary-strong) !important;
+  transform: translateY(-1px);
+}
+
+.pf-c-button.pf-m-secondary,
+.pf-v5-c-button.pf-m-secondary,
+.pf-c-button.pf-m-link,
+.pf-v5-c-button.pf-m-link {
+  color: var(--peak-primary) !important;
+  border-color: var(--peak-border-soft) !important;
+}
+
+.pf-c-button.pf-m-secondary:hover,
+.pf-v5-c-button.pf-m-secondary:hover {
+  background: rgba(224, 80, 40, 0.1) !important;
+  border-color: rgba(224, 80, 40, 0.5) !important;
+}
+
+a,
+.pf-c-nav__link,
+.pf-v5-c-nav__link,
+.pf-c-tabs__link,
+.pf-v5-c-tabs__link {
+  color: var(--peak-primary) !important;
+}
+
+a:hover,
+.pf-c-nav__link:hover,
+.pf-v5-c-nav__link:hover,
+.pf-c-tabs__link:hover,
+.pf-v5-c-tabs__link:hover {
+  color: var(--peak-primary-strong) !important;
+}
+
+.pf-c-nav__link.pf-m-current,
+.pf-v5-c-nav__link.pf-m-current,
+.pf-c-tabs__item.pf-m-current .pf-c-tabs__link,
+.pf-v5-c-tabs__item.pf-m-current .pf-v5-c-tabs__link {
+  background: rgba(224, 80, 40, 0.15) !important;
+  border-color: rgba(224, 80, 40, 0.45) !important;
+}
+
+.pf-c-table,
+.pf-v5-c-table,
+table {
+  background: transparent !important;
+  color: var(--peak-text) !important;
+}
+
+.pf-c-table tr,
+.pf-v5-c-table tr,
+table tr {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.pf-c-table th,
+.pf-v5-c-table th,
+.pf-c-table td,
+.pf-v5-c-table td,
+table th,
+table td {
+  color: var(--peak-subtext) !important;
+}
+
+.pf-c-alert,
+.pf-v5-c-alert,
+.alert {
+  border-radius: 12px !important;
+  border: 1px solid var(--peak-border-soft) !important;
+}
+
+.pf-m-success,
+.alert-success {
+  background: rgba(26, 106, 48, 0.28) !important;
+  color: #d6ffe5 !important;
+}
+
+.pf-m-danger,
+.alert-danger {
+  background: rgba(196, 52, 22, 0.2) !important;
+  color: #ffd8ce !important;
+}
+
+.pf-m-warning,
+.alert-warning {
+  background: rgba(131, 92, 19, 0.28) !important;
+  color: #ffe9bd !important;
+}
+
+@media (max-width: 767.98px) {
+  .pf-c-card,
+  .pf-v5-c-card {
+    border-radius: 14px !important;
+  }
+}

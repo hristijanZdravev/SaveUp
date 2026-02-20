@@ -19,19 +19,14 @@ namespace SaveUp.Controllers
             _context = context;
         }
 
-        // IMPORTANT:
-        // If you're using Keycloak, prefer: User.FindFirst("sub")?.Value
-        // but keeping your current approach as requested:
         private string GetUserId() =>
             User?.Identity?.Name ?? throw new UnauthorizedAccessException();
 
         // =========================
-        // GET ALL WORKOUTS
+        // GET ALL (PAGINATED)
         // =========================
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] int page,
-            [FromQuery] int pageSize)
+        public async Task<IActionResult> GetAll(int page = 1, int pageSize = 10)
         {
             var userId = GetUserId();
 
@@ -41,7 +36,7 @@ namespace SaveUp.Controllers
 
             var total = await query.CountAsync();
 
-            var workouts = await query
+            var data = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(w => new WorkoutListDto
@@ -52,18 +47,11 @@ namespace SaveUp.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(new
-            {
-                page,
-                pageSize,
-                total,
-                data = workouts
-            });
+            return Ok(new { page, pageSize, total, data });
         }
 
-
         // =========================
-        // GET WORKOUT DETAILS
+        // GET DETAILS (SAFE DTO)
         // =========================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -72,49 +60,43 @@ namespace SaveUp.Controllers
 
             var workout = await _context.Workouts
                 .Where(w => w.Id == id && w.UserId == userId)
-                .Include(w => w.WorkoutExercises)
-                    .ThenInclude(we => we.Exercise)
-                .Include(w => w.WorkoutExercises)
-                    .ThenInclude(we => we.Sets)
+                .Select(w => new WorkoutDetailsDto
+                {
+                    Id = w.Id,
+                    Title = w.Title,
+                    Date = w.Date,
+                    Exercises = w.WorkoutExercises
+                        .OrderBy(we => we.Order)
+                        .Select(we => new WorkoutExerciseDto
+                        {
+                            Id = we.Id,
+                            Order = we.Order,
+                            ExerciseId = we.ExerciseId,
+                            ExerciseTitle = we.Exercise.Title,
+                            Sets = we.Sets
+                                .OrderBy(s => s.SetNumber)
+                                .Select(s => new WorkoutSetDto
+                                {
+                                    Id = s.Id,
+                                    SetNumber = s.SetNumber,
+                                    Reps = s.Reps,
+                                    Weight = (decimal)s.Weight!
+                                }).ToList()
+                        }).ToList()
+                })
                 .FirstOrDefaultAsync();
 
             if (workout == null)
                 return NotFound();
 
-            var result = new WorkoutDetailsDto
-            {
-                Id = workout.Id,
-                Title = workout.Title,
-                Date = workout.Date,
-                WorkoutExercises = workout.WorkoutExercises
-                    .OrderBy(we => we.Order)
-                    .Select(we => new WorkoutExerciseDto
-                    {
-                        Id = we.Id,
-                        ExerciseId = we.ExerciseId,
-                        ExerciseTitle = we.Exercise.Title,
-                        Sets = we.Sets
-                            .OrderBy(s => s.SetNumber)
-                            .Select(s => new WorkoutSetDto
-                            {
-                                Id = s.Id,
-                                SetNumber = s.SetNumber,
-                                Reps = s.Reps,
-                                Weight = (decimal)s.Weight
-                            })
-                            .ToList()
-                    })
-                    .ToList()
-            };
-
-            return Ok(result);
+            return Ok(workout);
         }
 
         // =========================
-        // CREATE WORKOUT
+        // CREATE
         // =========================
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] WorkoutCreateDto dto)
+        public async Task<IActionResult> Create(WorkoutCreateDto dto)
         {
             var workout = new Workout
             {
@@ -136,103 +118,59 @@ namespace SaveUp.Controllers
         }
 
         // =========================
-        // UPDATE WORKOUT
-        // =========================
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] WorkoutUpdateDto dto)
-        {
-            var userId = GetUserId();
-
-            var workout = await _context.Workouts
-                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
-
-            if (workout == null)
-                return NotFound();
-
-            workout.Title = dto.Title;
-            workout.Date = dto.Date;
-
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        // =========================
-        // DELETE WORKOUT
-        // =========================
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var userId = GetUserId();
-
-            var workout = await _context.Workouts
-                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
-
-            if (workout == null)
-                return NotFound();
-
-            _context.Workouts.Remove(workout);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // =========================
-        // ADD EXERCISE TO WORKOUT
+        // ADD EXERCISE
         // =========================
         [HttpPost("{workoutId}/exercises")]
-        public async Task<IActionResult> AddExercise(Guid workoutId, [FromBody] AddExerciseDto dto)
+        public async Task<IActionResult> AddExercise(Guid workoutId, AddExerciseDto dto)
         {
             var userId = GetUserId();
 
             var workout = await _context.Workouts
                 .FirstOrDefaultAsync(w => w.Id == workoutId && w.UserId == userId);
 
-            if (workout == null)
-                return NotFound();
+            if (workout == null) return NotFound();
 
-            var workoutExercise = new WorkoutExercise
+            var order = await _context.WorkoutExercises
+                .Where(x => x.WorkoutId == workoutId)
+                .CountAsync() + 1;
+
+            var we = new WorkoutExercise
             {
                 Id = Guid.NewGuid(),
                 WorkoutId = workoutId,
                 ExerciseId = dto.ExerciseId,
-                Order = await _context.WorkoutExercises.CountAsync(x => x.WorkoutId == workoutId) + 1
+                Order = order
             };
 
-            _context.WorkoutExercises.Add(workoutExercise);
+            _context.WorkoutExercises.Add(we);
             await _context.SaveChangesAsync();
 
-            var exerciseTitle = await _context.Exercises
-                .Where(e => e.Id == dto.ExerciseId)
-                .Select(e => e.Title)
-                .FirstAsync();
-
-            return Ok(new WorkoutExerciseDto
-            {
-                Id = workoutExercise.Id,
-                ExerciseId = workoutExercise.ExerciseId,
-                ExerciseTitle = exerciseTitle,
-                Sets = []
-            });
+            return Ok(new { we.Id, we.Order });
         }
 
         // =========================
-        // DELETE EXERCISE FROM WORKOUT
+        // REORDER
         // =========================
-        [HttpDelete("exercises/{workoutExerciseId}")]
-        public async Task<IActionResult> DeleteExercise(Guid workoutExerciseId)
+        [HttpPut("{workoutId}/reorder")]
+        public async Task<IActionResult> Reorder(Guid workoutId, ReorderWorkoutExercisesDto dto)
         {
             var userId = GetUserId();
 
-            var workoutExercise = await _context.WorkoutExercises
-                .Include(we => we.Workout)
-                .FirstOrDefaultAsync(we => we.Id == workoutExerciseId);
+            var exercises = await _context.WorkoutExercises
+                .Include(x => x.Workout)
+                .Where(x => x.WorkoutId == workoutId && x.Workout.UserId == userId)
+                .ToListAsync();
 
-            if (workoutExercise == null || workoutExercise.Workout.UserId != userId)
-                return NotFound();
+            int order = 1;
 
-            _context.WorkoutExercises.Remove(workoutExercise);
+            foreach (var item in dto.Items.OrderBy(x => x.Order))
+            {
+                var ex = exercises.FirstOrDefault(x => x.Id == item.WorkoutExerciseId);
+                if (ex != null)
+                    ex.Order = order++;
+            }
+
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
@@ -240,15 +178,15 @@ namespace SaveUp.Controllers
         // ADD SET
         // =========================
         [HttpPost("exercises/{workoutExerciseId}/sets")]
-        public async Task<IActionResult> AddSet(Guid workoutExerciseId, [FromBody] AddSetDto dto)
+        public async Task<IActionResult> AddSet(Guid workoutExerciseId, AddSetDto dto)
         {
             var userId = GetUserId();
 
-            var workoutExercise = await _context.WorkoutExercises
-                .Include(we => we.Workout)
-                .FirstOrDefaultAsync(we => we.Id == workoutExerciseId);
+            var we = await _context.WorkoutExercises
+                .Include(x => x.Workout)
+                .FirstOrDefaultAsync(x => x.Id == workoutExerciseId);
 
-            if (workoutExercise == null || workoutExercise.Workout.UserId != userId)
+            if (we == null || we.Workout.UserId != userId)
                 return NotFound();
 
             var set = new WorkoutSet
@@ -268,31 +206,8 @@ namespace SaveUp.Controllers
                 Id = set.Id,
                 SetNumber = set.SetNumber,
                 Reps = set.Reps,
-                Weight = (decimal)set.Weight
+                Weight = (decimal)set.Weight!
             });
-        }
-
-        // =========================
-        // UPDATE SET
-        // =========================
-        [HttpPut("sets/{setId}")]
-        public async Task<IActionResult> UpdateSet(Guid setId, [FromBody] UpdateSetDto dto)
-        {
-            var userId = GetUserId();
-
-            var set = await _context.WorkoutSets
-                .Include(s => s.WorkoutExercise)
-                .ThenInclude(we => we.Workout)
-                .FirstOrDefaultAsync(s => s.Id == setId);
-
-            if (set == null || set.WorkoutExercise.Workout.UserId != userId)
-                return NotFound();
-
-            set.Reps = dto.Reps;
-            set.Weight = dto.Weight;
-
-            await _context.SaveChangesAsync();
-            return NoContent();
         }
 
         // =========================
@@ -301,49 +216,13 @@ namespace SaveUp.Controllers
         [HttpDelete("sets/{setId}")]
         public async Task<IActionResult> DeleteSet(Guid setId)
         {
-            var userId = GetUserId();
-
-            var set = await _context.WorkoutSets
-                .Include(s => s.WorkoutExercise)
-                .ThenInclude(we => we.Workout)
-                .FirstOrDefaultAsync(s => s.Id == setId);
-
-            if (set == null || set.WorkoutExercise.Workout.UserId != userId)
-                return NotFound();
+            var set = await _context.WorkoutSets.FindAsync(setId);
+            if (set == null) return NotFound();
 
             _context.WorkoutSets.Remove(set);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-
-        [HttpGet("filter")]
-        public async Task<IActionResult> FilterByDays([FromQuery] int days = 7)
-        {
-            var userId = GetUserId();
-
-            if (days <= 0)
-                return BadRequest("Days must be greater than 0");
-
-            var startDate = DateTime.UtcNow.AddDays(-days);
-
-            var workouts = await _context.Workouts
-                .Where(w => w.UserId == userId && w.Date >= startDate)
-                .OrderByDescending(w => w.Date)
-                .Select(w => new WorkoutListDto
-                {
-                    Id = w.Id,
-                    Title = w.Title,
-                    Date = w.Date
-                })
-                .ToListAsync();
-
-            return Ok(workouts);
-        }
-
-
     }
-
-
-
 }
