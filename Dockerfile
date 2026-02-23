@@ -12,11 +12,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Debug
 WORKDIR /src
-COPY ["SaveUp.csproj", "."]
-RUN dotnet restore "./SaveUp.csproj"
+COPY ["PeakLift.csproj", "."]
+RUN dotnet restore "./PeakLift.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./SaveUp.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./PeakLift.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 
 # Install EF CLI
@@ -26,10 +26,10 @@ ENV PATH="${PATH}:/root/.dotnet/tools"
 # This stage is used to publish the service project to be copied to the final stage
 # FROM build AS publish
 # ARG BUILD_CONFIGURATION=Debug
-# RUN dotnet publish "./SaveUp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# RUN dotnet publish "./PeakLift.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/build .
-ENTRYPOINT ["dotnet", "SaveUp.dll"]
+ENTRYPOINT ["dotnet", "PeakLift.dll"]

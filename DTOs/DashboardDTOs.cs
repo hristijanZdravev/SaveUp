@@ -1,4 +1,4 @@
-﻿namespace SaveUp.DTOs
+﻿namespace PeakLift.DTOs
 {
     // =========================
     // DASHBOARD
@@ -8,7 +8,8 @@
     {
         public int TotalWorkouts { get; set; }
         public int TotalSets { get; set; }
-        public decimal TotalVolume { get; set; }
+        public int TotalVolume { get; set; }
+        public int ActiveDays { get; set; }
     }
 
     public class RecentWorkoutDto

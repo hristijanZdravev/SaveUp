@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SaveUp.Data;
+using PeakLift.Data;
 
 #nullable disable
 
-namespace SaveUp.Migrations
+namespace PeakLift.Migrations
 {
     [DbContext(typeof(Context))]
     [Migration("20260219223624_Init")]
@@ -25,7 +25,7 @@ namespace SaveUp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SaveUp.Models.BodyGroup", b =>
+            modelBuilder.Entity("PeakLift.Models.BodyGroup", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace SaveUp.Migrations
                     b.ToTable("BodyGroups");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.Exercise", b =>
+            modelBuilder.Entity("PeakLift.Models.Exercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +69,7 @@ namespace SaveUp.Migrations
                     b.ToTable("Exercises");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.Workout", b =>
+            modelBuilder.Entity("PeakLift.Models.Workout", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,7 +91,7 @@ namespace SaveUp.Migrations
                     b.ToTable("Workouts");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.WorkoutExercise", b =>
+            modelBuilder.Entity("PeakLift.Models.WorkoutExercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +118,7 @@ namespace SaveUp.Migrations
                     b.ToTable("WorkoutExercises");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.WorkoutSet", b =>
+            modelBuilder.Entity("PeakLift.Models.WorkoutSet", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,9 +146,9 @@ namespace SaveUp.Migrations
                     b.ToTable("WorkoutSets");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.Exercise", b =>
+            modelBuilder.Entity("PeakLift.Models.Exercise", b =>
                 {
-                    b.HasOne("SaveUp.Models.BodyGroup", "BodyGroup")
+                    b.HasOne("PeakLift.Models.BodyGroup", "BodyGroup")
                         .WithMany("Exercises")
                         .HasForeignKey("BodyGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -157,15 +157,15 @@ namespace SaveUp.Migrations
                     b.Navigation("BodyGroup");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.WorkoutExercise", b =>
+            modelBuilder.Entity("PeakLift.Models.WorkoutExercise", b =>
                 {
-                    b.HasOne("SaveUp.Models.Exercise", "Exercise")
+                    b.HasOne("PeakLift.Models.Exercise", "Exercise")
                         .WithMany("WorkoutExercises")
                         .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SaveUp.Models.Workout", "Workout")
+                    b.HasOne("PeakLift.Models.Workout", "Workout")
                         .WithMany("WorkoutExercises")
                         .HasForeignKey("WorkoutId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -176,9 +176,9 @@ namespace SaveUp.Migrations
                     b.Navigation("Workout");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.WorkoutSet", b =>
+            modelBuilder.Entity("PeakLift.Models.WorkoutSet", b =>
                 {
-                    b.HasOne("SaveUp.Models.WorkoutExercise", "WorkoutExercise")
+                    b.HasOne("PeakLift.Models.WorkoutExercise", "WorkoutExercise")
                         .WithMany("Sets")
                         .HasForeignKey("WorkoutExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -187,22 +187,22 @@ namespace SaveUp.Migrations
                     b.Navigation("WorkoutExercise");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.BodyGroup", b =>
+            modelBuilder.Entity("PeakLift.Models.BodyGroup", b =>
                 {
                     b.Navigation("Exercises");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.Exercise", b =>
+            modelBuilder.Entity("PeakLift.Models.Exercise", b =>
                 {
                     b.Navigation("WorkoutExercises");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.Workout", b =>
+            modelBuilder.Entity("PeakLift.Models.Workout", b =>
                 {
                     b.Navigation("WorkoutExercises");
                 });
 
-            modelBuilder.Entity("SaveUp.Models.WorkoutExercise", b =>
+            modelBuilder.Entity("PeakLift.Models.WorkoutExercise", b =>
                 {
                     b.Navigation("Sets");
                 });

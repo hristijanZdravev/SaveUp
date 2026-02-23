@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import './styles/shared-user-pages.css';
 
 :root {
   --brand-primary: #e05028;

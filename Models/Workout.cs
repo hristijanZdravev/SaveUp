@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SaveUp.Models
+namespace PeakLift.Models
 {
     public class Workout
     {

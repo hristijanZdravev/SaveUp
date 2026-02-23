@@ -1,10 +1,5 @@
-﻿namespace SaveUp.DTOs
+namespace PeakLift.DTOs
 {
-
-    // =========================
-    // ANALYTICS
-    // =========================
-
     public class AnalyticsOverviewDto
     {
         public int TotalWorkouts { get; set; }
@@ -21,12 +16,6 @@
     public class WorkoutFrequencyDto
     {
         public DateTime Date { get; set; }
-        public int Count { get; set; }
-    }
-
-    public class BodyPartDistributionDto
-    {
-        public string BodyPart { get; set; } = null!;
         public int Count { get; set; }
     }
 }

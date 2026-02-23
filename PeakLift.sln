@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.0.11222.15 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveUp", "SaveUp.csproj", "{5BA3DE7E-48EE-43F8-A013-755625E06EA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeakLift", "PeakLift.csproj", "{5BA3DE7E-48EE-43F8-A013-755625E06EA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,21 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SaveUp.Data;
-using SaveUp.DTOs;
+using PeakLift.Services;
 
-namespace SaveUp.Controllers
+namespace PeakLift.Controllers
 {
     [ApiController]
     [Route("api/body-parts")]
     [Authorize]
     public class BodyPartsController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly IBodyPartsService _bodyPartsService;
 
-        public BodyPartsController(Context context)
+        public BodyPartsController(IBodyPartsService bodyPartsService)
         {
-            _context = context;
+            _bodyPartsService = bodyPartsService;
         }
 
         private string GetUserId() =>
@@ -25,14 +23,7 @@ namespace SaveUp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var bodyParts = await _context.BodyGroups
-                .Select(b => new BodyPartDto
-                {
-                    Id = b.Id,
-                    Name = b.Name
-                })
-                .ToListAsync();
-
+            var bodyParts = await _bodyPartsService.GetAllAsync();
             return Ok(bodyParts);
         }
 
@@ -40,16 +31,7 @@ namespace SaveUp.Controllers
         public async Task<IActionResult> GetStats(Guid id)
         {
             var userId = GetUserId();
-
-            var dto = new BodyPartStatsDto
-            {
-                TotalSets = await _context.WorkoutSets
-                    .Where(s =>
-                        s.WorkoutExercise.Workout.UserId == userId &&
-                        s.WorkoutExercise.Exercise.BodyGroupId == id)
-                    .CountAsync()
-            };
-
+            var dto = await _bodyPartsService.GetStatsAsync(userId, id);
             return Ok(dto);
         }
     }

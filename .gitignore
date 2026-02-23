@@ -24,13 +24,13 @@ appsettings.Development.json
 appsettings.Local.json
 
 # Angular
-_SaveUpClient/node_modules/
-_SaveUpClient/dist/
-_SaveUpClient/.angular/
-_SaveUpClient/.env
-_SaveUpClient/.env.*.local
-_SaveUpClient/*.local.*
-_SaveUpClient/.vscode/
+_PeakLiftClient/node_modules/
+_PeakLiftClient/dist/
+_PeakLiftClient/.angular/
+_PeakLiftClient/.env
+_PeakLiftClient/.env.*.local
+_PeakLiftClient/*.local.*
+_PeakLiftClient/.vscode/
 
 # IDE/Tooling
 .idea/
@@ -59,7 +59,7 @@ Desktop.ini
 
 # Test coverage
 coverage/
-_SaveUpClient/coverage/
+_PeakLiftClient/coverage/
 
 # Optional lock files
 # Uncomment the one you don't want to commit

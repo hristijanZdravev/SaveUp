@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using SaveUp.Data;
-using SaveUp.Services;
-using static SaveUp.Data.ModelBuilderExtensions;
+using PeakLift.Data;
+using PeakLift.Repository;
+using PeakLift.Services;
+using static PeakLift.Data.ModelBuilderExtensions;
 
-namespace SaveUp
+namespace PeakLift
 {
     public class Program
     {
@@ -126,6 +127,19 @@ namespace SaveUp
             // register in DI
             builder.Services.AddSingleton(cloudinary);
             builder.Services.AddScoped<CloudinaryService>();
+
+            builder.Services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
+            builder.Services.AddScoped<IBodyGroupRepository, BodyGroupRepository>();
+            builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+            builder.Services.AddScoped<IWorkoutRepository, WorkoutRepository>();
+            builder.Services.AddScoped<IWorkoutExerciseRepository, WorkoutExerciseRepository>();
+            builder.Services.AddScoped<IWorkoutSetRepository, WorkoutSetRepository>();
+
+            builder.Services.AddScoped<IBodyPartsService, BodyPartsService>();
+            builder.Services.AddScoped<IExercisesService, ExercisesService>();
+            builder.Services.AddScoped<IWorkoutsService, WorkoutsService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
             var app = builder.Build();
 

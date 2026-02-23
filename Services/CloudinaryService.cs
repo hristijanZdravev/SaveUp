@@ -1,6 +1,6 @@
 ﻿using CloudinaryDotNet;
 
-namespace SaveUp.Services
+namespace PeakLift.Services
 {
     public class CloudinaryService
     {

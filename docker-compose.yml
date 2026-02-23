@@ -15,12 +15,12 @@ services:
 #   frontend:
 #     container_name: angular-client
 #     build:
-#       context: ./_SaveUpClient
+#       context: ./_PeakLiftClient
 #       dockerfile: Dockerfile
 #     ports:
 #       - "4200:4200"
 #     volumes:
-#       - ./_SaveUpClient:/app
+#       - ./_PeakLiftClient:/app
 #       - /app/node_modules
 #     stdin_open: true
 #     tty: true
@@ -46,7 +46,7 @@ services:
       ports:
         - 8080:8080
       volumes:
-        - ./_SaveUpClient/themes:/opt/keycloak/themes
+        - ./_PeakLiftClient/themes:/opt/keycloak/themes
       command:
         - start-dev
         - --spi-theme-cache-themes=false

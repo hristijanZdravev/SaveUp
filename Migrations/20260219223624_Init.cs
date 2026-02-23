@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SaveUp.Migrations
+namespace PeakLift.Migrations
 {
     /// <inheritdoc />
     public partial class Init : Migration

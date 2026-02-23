@@ -1,4 +1,4 @@
-﻿namespace SaveUp.DTOs
+﻿namespace PeakLift.DTOs
 {
     // =========================
     // BODY PARTS

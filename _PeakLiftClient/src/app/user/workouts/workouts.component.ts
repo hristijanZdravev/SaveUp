@@ -30,7 +30,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
 
   // Pagination
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 9;
   totalWorkouts = 0;
 
   // Filter
@@ -314,4 +314,5 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
     this.filterOptions[3].label = this.i18n.t('range.last30');
   }
 }
+
 

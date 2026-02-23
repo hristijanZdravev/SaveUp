@@ -45,19 +45,8 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
-.section-kicker {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  font-size: 0.78rem;
-}
-
 :host-context(.dark-theme) .section-kicker {
   color: rgba(224, 80, 40, 0.9);
-}
-
-:host-context(.light-theme) .section-kicker {
-  color: #e05028;
 }
 
 :host-context(.dark-theme) .hero-panel .lead,
@@ -266,20 +255,6 @@
   background: rgba(0, 0, 0, 0.03);
 }
 
-:host-context(.dark-theme) .form-control,
-:host-context(.dark-theme) .form-select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.92);
-}
-
-:host-context(.light-theme) .form-control,
-:host-context(.light-theme) .form-select {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  color: rgba(0, 0, 0, 0.9);
-}
-
 :host-context(.dark-theme) .input-group-text {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -416,16 +391,6 @@
 :host-context(.light-theme) .form-label,
 :host-context(.light-theme) .modal-title {
   color: rgba(0, 0, 0, 0.88);
-}
-
-:host-context(.dark-theme) .modal-header,
-:host-context(.dark-theme) .modal-footer {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-:host-context(.light-theme) .modal-header,
-:host-context(.light-theme) .modal-footer {
-  border-color: rgba(0, 0, 0, 0.08);
 }
 
 :host-context(.dark-theme) .text-muted {

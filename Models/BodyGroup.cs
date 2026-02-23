@@ -1,4 +1,4 @@
-﻿namespace SaveUp.Models
+﻿namespace PeakLift.Models
 {
     public class BodyGroup
     {

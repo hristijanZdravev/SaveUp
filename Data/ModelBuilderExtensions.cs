@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SaveUp.Models;
+using PeakLift.Models;
 
-namespace SaveUp.Data
+namespace PeakLift.Data
 {
     public static class ModelBuilderExtensions
     {
