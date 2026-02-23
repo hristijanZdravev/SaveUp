@@ -145,6 +145,86 @@ textarea:focus,
   box-shadow: 0 0 0 3px rgba(224, 80, 40, 0.2) !important;
 }
 
+/* Locale selector + PatternFly select dropdowns */
+.pf-c-menu-toggle,
+.pf-v5-c-menu-toggle,
+.pf-c-select__toggle,
+.pf-v5-c-select__toggle,
+[data-testid*="locale"] .pf-v5-c-menu-toggle,
+[data-testid*="locale"] .pf-c-menu-toggle {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  color: var(--peak-text) !important;
+  min-height: 2.8rem !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+.pf-c-menu-toggle:hover,
+.pf-v5-c-menu-toggle:hover,
+.pf-c-menu-toggle:focus,
+.pf-v5-c-menu-toggle:focus,
+.pf-c-menu-toggle[aria-expanded="true"],
+.pf-v5-c-menu-toggle[aria-expanded="true"] {
+  border-color: rgba(224, 80, 40, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(224, 80, 40, 0.2) !important;
+}
+
+.pf-c-select__menu,
+.pf-v5-c-select__menu,
+.pf-c-menu,
+.pf-v5-c-menu {
+  background: linear-gradient(150deg, var(--peak-surface), var(--peak-surface-2)) !important;
+  border: 1px solid var(--peak-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+.pf-c-select__menu-item,
+.pf-v5-c-select__menu-item,
+.pf-c-menu__item,
+.pf-v5-c-menu__item,
+.pf-c-menu__item-main,
+.pf-v5-c-menu__item-main {
+  color: var(--peak-subtext) !important;
+  text-decoration: none !important;
+}
+
+.pf-c-menu-toggle__text,
+.pf-v5-c-menu-toggle__text,
+[data-testid*="locale"] a,
+[data-testid*="locale"] a:link,
+[data-testid*="locale"] a:visited {
+  color: var(--peak-subtext) !important;
+  text-decoration: none !important;
+}
+
+/* Remove PatternFly underline/bottom accent from locale select */
+[data-testid*="locale"] .pf-c-menu-toggle::before,
+[data-testid*="locale"] .pf-v5-c-menu-toggle::before,
+[data-testid*="locale"] .pf-c-menu-toggle::after,
+[data-testid*="locale"] .pf-v5-c-menu-toggle::after,
+.pf-c-menu-toggle::before,
+.pf-v5-c-menu-toggle::before,
+.pf-c-menu-toggle::after,
+.pf-v5-c-menu-toggle::after {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.pf-c-select__menu-item:hover,
+.pf-v5-c-select__menu-item:hover,
+.pf-c-menu__item:hover,
+.pf-v5-c-menu__item:hover,
+.pf-c-menu__item-main:hover,
+.pf-v5-c-menu__item-main:hover {
+  background: rgba(224, 80, 40, 0.14) !important;
+  color: #fff !important;
+}
+
 input::before,
 input::after,
 textarea::before,
@@ -277,4 +357,33 @@ table td {
   .pf-v5-c-card {
     border-radius: 14px !important;
   }
+}
+
+/* Hide username/email fields in Account Console personal info */
+#username,
+#email,
+input[name="username"],
+input[name="email"],
+label[for="username"],
+label[for="email"],
+[data-testid="username"],
+[data-testid="email"],
+[data-field-name="username"],
+[data-field-name="email"] {
+  display: none !important;
+}
+
+.pf-c-form__group:has(input[name="username"]),
+.pf-v5-c-form__group:has(input[name="username"]),
+.pf-c-form__group:has(input[name="email"]),
+.pf-v5-c-form__group:has(input[name="email"]),
+.pf-c-form__group:has(#username),
+.pf-v5-c-form__group:has(#username),
+.pf-c-form__group:has(#email),
+.pf-v5-c-form__group:has(#email),
+[data-testid="username"] .pf-c-form__group,
+[data-testid="email"] .pf-c-form__group,
+[data-testid="username"] .pf-v5-c-form__group,
+[data-testid="email"] .pf-v5-c-form__group {
+  display: none !important;
 }

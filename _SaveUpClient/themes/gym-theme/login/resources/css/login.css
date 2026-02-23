@@ -876,3 +876,146 @@ body[class*="page-register"] #kc-content-wrapper .login-pf-header .instruction {
   text-align: center !important;
   white-space: normal !important;
 }
+
+/* Locale switcher (language dropdown) */
+#kc-locale,
+#kc-locale-wrapper {
+  position: relative !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  margin: 0 0 0.65rem 0 !important;
+  z-index: 20 !important;
+}
+
+#kc-locale-dropdown,
+#kc-locale ul,
+#kc-locale-list {
+  position: relative !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#kc-current-locale-link,
+#kc-locale-dropdown > a,
+#kc-locale .pf-c-dropdown__toggle,
+#kc-locale .pf-v5-c-dropdown__toggle,
+#kc-locale .pf-c-menu-toggle,
+#kc-locale .pf-v5-c-menu-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  min-height: 2.2rem !important;
+  padding: 0.48rem 0.85rem !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--peak-border-soft) !important;
+  background: rgba(20, 20, 20, 0.95) !important;
+  color: var(--peak-subtext) !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+#kc-current-locale-link:link,
+#kc-current-locale-link:visited,
+#kc-locale-dropdown > a:link,
+#kc-locale-dropdown > a:visited,
+#kc-locale .pf-c-menu-toggle__text,
+#kc-locale .pf-v5-c-menu-toggle__text {
+  color: var(--peak-subtext) !important;
+  text-decoration: none !important;
+}
+
+/* Remove PatternFly underline/bottom accent from locale selector */
+#kc-locale .pf-c-menu-toggle::before,
+#kc-locale .pf-v5-c-menu-toggle::before,
+#kc-locale .pf-c-menu-toggle::after,
+#kc-locale .pf-v5-c-menu-toggle::after {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#kc-current-locale-link:hover,
+#kc-current-locale-link:focus,
+#kc-locale-dropdown > a:hover,
+#kc-locale-dropdown > a:focus,
+#kc-locale .pf-c-dropdown__toggle:hover,
+#kc-locale .pf-v5-c-dropdown__toggle:hover,
+#kc-locale .pf-c-menu-toggle:hover,
+#kc-locale .pf-v5-c-menu-toggle:hover {
+  color: var(--peak-text) !important;
+  border-color: rgba(224, 80, 40, 0.52) !important;
+  background: rgba(224, 80, 40, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(224, 80, 40, 0.16) !important;
+}
+
+#kc-locale ul,
+#kc-locale-list,
+#kc-locale-dropdown ul,
+#kc-locale-dropdown .pf-c-dropdown__menu,
+#kc-locale-dropdown .pf-v5-c-dropdown__menu,
+#kc-locale-dropdown .pf-c-menu,
+#kc-locale-dropdown .pf-v5-c-menu {
+  display: none !important;
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+  top: calc(100% + 0.4rem) !important;
+  min-width: 12rem !important;
+  border: 1px solid var(--peak-border) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(150deg, var(--peak-surface), var(--peak-surface-2)) !important;
+  box-shadow: var(--peak-shadow) !important;
+  overflow: hidden !important;
+}
+
+/* Open states for Keycloak + PatternFly variants */
+#kc-locale-wrapper:hover ul,
+#kc-locale-wrapper:focus-within ul,
+#kc-locale-dropdown:hover ul,
+#kc-locale-dropdown:focus-within ul,
+#kc-locale .pf-c-dropdown.pf-m-expanded .pf-c-dropdown__menu,
+#kc-locale .pf-v5-c-dropdown.pf-m-expanded .pf-v5-c-dropdown__menu,
+#kc-locale .pf-c-menu-toggle[aria-expanded="true"] + .pf-c-menu,
+#kc-locale .pf-v5-c-menu-toggle[aria-expanded="true"] + .pf-v5-c-menu {
+  display: block !important;
+}
+
+#kc-locale ul li,
+#kc-locale-list li,
+#kc-locale-dropdown .pf-c-dropdown__menu-item,
+#kc-locale-dropdown .pf-v5-c-dropdown__menu-item,
+#kc-locale-dropdown .pf-c-menu__item,
+#kc-locale-dropdown .pf-v5-c-menu__item {
+  list-style: none !important;
+  margin: 0 !important;
+}
+
+#kc-locale ul li a,
+#kc-locale-list li a,
+#kc-locale-dropdown .pf-c-dropdown__menu-item a,
+#kc-locale-dropdown .pf-v5-c-dropdown__menu-item a,
+#kc-locale-dropdown .pf-c-menu__item a,
+#kc-locale-dropdown .pf-v5-c-menu__item a {
+  display: block !important;
+  width: 100% !important;
+  padding: 0.66rem 0.9rem !important;
+  color: var(--peak-subtext) !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+#kc-locale ul li a:hover,
+#kc-locale ul li a:focus,
+#kc-locale-list li a:hover,
+#kc-locale-list li a:focus,
+#kc-locale-dropdown .pf-c-dropdown__menu-item a:hover,
+#kc-locale-dropdown .pf-v5-c-dropdown__menu-item a:hover,
+#kc-locale-dropdown .pf-c-menu__item a:hover,
+#kc-locale-dropdown .pf-v5-c-menu__item a:hover {
+  color: #fff !important;
+  background: rgba(224, 80, 40, 0.18) !important;
+}

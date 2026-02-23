@@ -5,12 +5,15 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../_services/theme.service';
 import { Subject, takeUntil } from 'rxjs';
+import { TPipe } from '../_pipes/t.pipe';
+import { I18nService } from '../_services/i18n.service';
 
 @Component({
   selector: 'app-navbar',
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    TPipe
   ],
   standalone: true,
   templateUrl: './navbar.component.html',
@@ -25,7 +28,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService, 
     private http: HttpClient,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    public i18n: I18nService
   ) {
     this.updateAuthState();
   }
@@ -56,10 +60,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authenticated = this.authService.isLoggedIn();
     if (this.authenticated) {
       try {
-        const rawName = this.authService.userName || 'User';
-        this.userName = rawName.split('@')[0] || 'User';
+        const fallbackUser = this.i18n.t('nav.user.fallback');
+        const rawName = this.authService.userName || fallbackUser;
+        this.userName = rawName.split('@')[0] || fallbackUser;
       } catch (error) {
-        this.userName = 'User';
+        this.userName = this.i18n.t('nav.user.fallback');
       }
     } else {
       this.userName = '';

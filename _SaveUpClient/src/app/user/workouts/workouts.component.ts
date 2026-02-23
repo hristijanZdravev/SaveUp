@@ -5,10 +5,13 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkoutService, Workout } from '../../_services/workout.service';
 import { ConfirmDeleteComponent } from '../../common/confirm-delete/confirm-delete.component';
+import { LocaleService } from '../../_services/locale.service';
+import { I18nService } from '../../_services/i18n.service';
+import { TPipe } from '../../_pipes/t.pipe';
 
 @Component({
   selector: 'app-workouts',
-  imports: [CommonModule, FormsModule, ConfirmDeleteComponent],
+  imports: [CommonModule, FormsModule, ConfirmDeleteComponent, TPipe],
   templateUrl: './workouts.component.html',
   styleUrl: './workouts.component.css'
 })
@@ -33,18 +36,22 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
   // Filter
   selectedFilter = 0; // 0 = all, 7 = week, 14 = two weeks, 30 = month
   filterOptions = [
-    { days: 0, label: 'All Time' },
-    { days: 7, label: 'Last 7 Days' },
-    { days: 14, label: 'Last 14 Days' },
-    { days: 30, label: 'Last 30 Days' }
+    { days: 0, label: '' },
+    { days: 7, label: '' },
+    { days: 14, label: '' },
+    { days: 30, label: '' }
   ];
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private workoutService: WorkoutService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private localeService: LocaleService,
+    private i18n: I18nService
+  ) {
+    this.setFilterLabels();
+  }
 
   ngOnInit() {
     this.loadWorkouts();
@@ -72,7 +79,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             console.error('Error loading workouts:', err);
-            this.error = 'Failed to load workouts. Please try again.';
+            this.error = this.i18n.t('error.workoutsLoad');
             this.loading = false;
           }
         });
@@ -89,7 +96,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             console.error('Error loading filtered workouts:', err);
-            this.error = 'Failed to load workouts. Please try again.';
+            this.error = this.i18n.t('error.filteredWorkoutsLoad');
             this.loading = false;
           }
         });
@@ -157,7 +164,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error creating workout:', err);
-          this.error = 'Failed to create workout. Please try again.';
+          this.error = this.i18n.t('error.workoutCreate');
           this.loading = false;
         }
       });
@@ -194,7 +201,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           console.error('Error deleting workout:', err);
-          this.error = 'Failed to delete workout. Please try again.';
+          this.error = this.i18n.t('error.workoutDelete');
           this.loading = false;
           this.showDeleteConfirm = false;
           this.deleteWorkoutId = null;
@@ -209,12 +216,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return this.localeService.formatShortDate(dateString);
   }
 
   copyWorkout(workoutId: string, event: Event) {
@@ -241,14 +243,14 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
               },
               error: (err) => {
                 console.error('Error creating copied workout:', err);
-                this.error = 'Failed to copy workout. Please try again.';
+                this.error = this.i18n.t('error.workoutCopy');
                 this.loading = false;
               }
             });
         },
         error: (err) => {
           console.error('Error fetching workout details:', err);
-          this.error = 'Failed to copy workout. Please try again.';
+          this.error = this.i18n.t('error.workoutCopy');
           this.loading = false;
         }
       });
@@ -272,7 +274,7 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error adding exercise:', err);
-          this.error = 'Failed to copy all exercises. Please try again.';
+          this.error = this.i18n.t('error.workoutCopy');
           this.loading = false;
         }
       });
@@ -299,10 +301,17 @@ export class WorkoutsComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           console.error('Error adding set:', err);
-          this.error = 'Failed to copy all sets. Please try again.';
+          this.error = this.i18n.t('error.workoutCopy');
           this.loading = false;
         }
       });
+  }
+
+  private setFilterLabels(): void {
+    this.filterOptions[0].label = this.i18n.t('range.allTime');
+    this.filterOptions[1].label = this.i18n.t('range.last7');
+    this.filterOptions[2].label = this.i18n.t('range.last14');
+    this.filterOptions[3].label = this.i18n.t('range.last30');
   }
 }
 

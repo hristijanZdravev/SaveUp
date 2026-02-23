@@ -35,6 +35,15 @@ export class AuthService {
   get userName(): string {
     return this.keycloak.getUsername();
   }
+
+  getTokenLocale(): string | null {
+    const parsed = this.keycloak.getKeycloakInstance().tokenParsed as { locale?: string } | undefined;
+    console.log("parsed", parsed?.locale);
+    console.log("parsed", parsed);
+    console.log("parsed", this.keycloak.getKeycloakInstance().token);
+    console.log("parsed", this.keycloak.getKeycloakInstance().tokenParsed);
+    return parsed?.locale ?? null;
+  }
    
   getUserRoles(): any[] {
     return this.keycloak.getUserRoles()

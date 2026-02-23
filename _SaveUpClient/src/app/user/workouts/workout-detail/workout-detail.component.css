@@ -293,7 +293,8 @@
 }
 
 .exercise-results {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.55rem;
   min-height: 220px;
   max-height: 260px;

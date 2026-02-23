@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TPipe } from '../_pipes/t.pipe';
 
 @Component({
   selector: 'app-main',
-  imports: [CommonModule],
+  imports: [CommonModule, TPipe],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
 })

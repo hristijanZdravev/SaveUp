@@ -3,12 +3,12 @@
     <section class="hero-panel mb-4 mb-md-5">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
-          <p class="section-kicker mb-2">Performance Center</p>
-          <h1 class="display-4 fw-bold mb-2">Dashboard</h1>
-          <p class="lead mb-0">See your totals, spotlight exercises, and recent sessions in one place.</p>
+          <p class="section-kicker mb-2">{{ 'dashboard.kicker' | t }}</p>
+          <h1 class="display-4 fw-bold mb-2">{{ 'dashboard.title' | t }}</h1>
+          <p class="lead mb-0">{{ 'dashboard.subtitle' | t }}</p>
           <div class="filter-strip mt-3">
             <div class="filter-container">
-              <div class="filter-label">Time Range</div>
+              <div class="filter-label">{{ 'common.timeRange' | t }}</div>
               <div class="filter-buttons">
                 <button
                   type="button"
@@ -23,8 +23,8 @@
           </div>
         </div>
         <div class="hero-actions d-flex gap-2">
-          <a routerLink="/workouts" class="btn btn-primary btn-lg">Open Workouts</a>
-          <a routerLink="/progress" class="btn btn-outline-light btn-lg alt-action">View Progress</a>
+          <a routerLink="/workouts" class="btn btn-primary btn-lg">{{ 'dashboard.openWorkouts' | t }}</a>
+          <a routerLink="/progress" class="btn btn-outline-light btn-lg alt-action">{{ 'dashboard.viewProgress' | t }}</a>
         </div>
       </div>
    </section>
@@ -32,13 +32,13 @@
     <section *ngIf="error" class="mb-4">
       <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
         <span>{{ error }}</span>
-        <button class="btn btn-sm btn-outline-danger" (click)="loadDashboardData()">Retry</button>
+        <button class="btn btn-sm btn-outline-danger" (click)="loadDashboardData()">{{ 'common.retry' | t }}</button>
       </div>
     </section>
 
     <section *ngIf="loading" class="loading-panel text-center py-5">
       <div class="spinner-border text-primary" role="status"></div>
-      <p class="mt-3 mb-0">Loading dashboard...</p>
+      <p class="mt-3 mb-0">{{ 'dashboard.loading' | t }}</p>
     </section>
 
     <ng-container *ngIf="!loading && !error && stats && summary">
@@ -46,13 +46,13 @@
         <div class="col-12 col-lg-7">
           <article class="panel-card h-100">
             <div class="panel-header d-flex justify-content-between align-items-center mb-3">
-              <h2 class="h4 mb-0">Recent Workouts</h2>
-              <a routerLink="/workouts" class="panel-link">See all</a>
+              <h2 class="h4 mb-0">{{ 'dashboard.recent.title' | t }}</h2>
+              <a routerLink="/workouts" class="panel-link">{{ 'dashboard.seeAll' | t }}</a>
             </div>
 
             <div *ngIf="recentWorkouts.length === 0" class="empty-state text-center py-4">
-              <p class="mb-2">No workouts yet.</p>
-              <a routerLink="/workouts" class="btn btn-primary btn-sm">Create your first workout</a>
+              <p class="mb-2">{{ 'dashboard.recent.empty' | t }}</p>
+              <a routerLink="/workouts" class="btn btn-primary btn-sm">{{ 'dashboard.recent.first' | t }}</a>
             </div>
 
             <div *ngIf="recentWorkouts.length > 0" class="recent-list">
@@ -61,7 +61,7 @@
                   <p class="recent-title mb-1">{{ workout.title }}</p>
                   <p class="recent-date mb-0">{{ formatDate(workout.date) }}</p>
                 </div>
-                <a [routerLink]="['/workouts', workout.id]" class="btn btn-sm btn-outline-primary">Open</a>
+                <a [routerLink]="['/workouts', workout.id]" class="btn btn-sm btn-outline-primary">{{ 'dashboard.open' | t }}</a>
               </div>
             </div>
           </article>
@@ -70,23 +70,23 @@
         <div class="col-12 col-lg-5">
           <article class="panel-card h-100">
             <div class="panel-header mb-3">
-              <h2 class="h4 mb-0">Performance Snapshot</h2>
+              <h2 class="h4 mb-0">{{ 'dashboard.snapshot.title' | t }}</h2>
             </div>
 
             <div class="snapshot-tile mb-3">
-              <p class="snapshot-label mb-1">Avg Reps / Set</p>
+              <p class="snapshot-label mb-1">{{ 'dashboard.avgRepsSet' | t }}</p>
               <p class="snapshot-value mb-0">{{ formatDecimal(avgRepsPerSet) }}</p>
             </div>
 
             <div class="snapshot-tile mb-3">
-              <p class="snapshot-label mb-1">Avg Sets / Workout</p>
+              <p class="snapshot-label mb-1">{{ 'dashboard.avgSetsWorkout' | t }}</p>
               <p class="snapshot-value mb-0">{{ formatDecimal(avgSetsPerWorkout) }}</p>
             </div>
 
             <div class="snapshot-tile" *ngIf="selectedDays > 0">
-              <p class="snapshot-label mb-1">Consistency Score</p>
+              <p class="snapshot-label mb-1">{{ 'dashboard.consistency' | t }}</p>
               <p class="snapshot-value mb-0">{{ formatDecimal(consistencyScore) }}%</p>
-              <p class="snapshot-sub mb-0">{{ activeDays }} active days</p>
+              <p class="snapshot-sub mb-0">{{ 'dashboard.activeDays' | t:{ count: activeDays } }}</p>
             </div>
           </article>
         </div>

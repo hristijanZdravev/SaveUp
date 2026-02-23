@@ -4,26 +4,29 @@
       <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
         <div>
           <button class="btn btn-outline-secondary mb-3" (click)="goBack()">
-            <i class="bi bi-arrow-left me-2"></i>Back to Workouts
+            <i class="bi bi-arrow-left me-2"></i>{{ 'workoutDetail.back' | t }}
           </button>
-          <p class="section-kicker mb-2">Workout Session</p>
+          <p class="section-kicker mb-2">{{ 'workoutDetail.kicker' | t }}</p>
           <h1 class="display-4 fw-bold mb-2">{{ workout.title }}</h1>
           <p class="lead mb-0">
             <i class="bi bi-calendar3 me-2"></i>{{ formatDate(workout.date) }}
             <span class="mx-2">|</span>
-            <span>{{ workout.workoutExercises.length }} exercises</span>
+            <span>{{ 'workoutDetail.exercisesCount' | t:{ count: workout.workoutExercises.length } }}</span>
           </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-secondary btn-lg" (click)="openEditWorkoutModal()" [disabled]="loading">
+            <i class="bi bi-pencil-square me-2"></i>{{ 'workoutDetail.editWorkout' | t }}
+          </button>
           <button
             class="btn btn-outline-secondary btn-lg"
             (click)="toggleCollapseExpandAction()"
             [disabled]="loading || !workout.workoutExercises.length">
             <i class="bi me-2" [ngClass]="showExpandAllAction ? 'bi-arrows-expand' : 'bi-arrows-collapse'"></i>
-            {{ showExpandAllAction ? 'Expand All' : 'Collapse All' }}
+            {{ showExpandAllAction ? ('workoutDetail.expandAll' | t) : ('workoutDetail.collapseAll' | t) }}
           </button>
           <button class="btn btn-primary btn-lg" (click)="openAddExerciseModal()" [disabled]="loading">
-            <i class="bi bi-plus-circle me-2"></i>Add Exercise
+            <i class="bi bi-plus-circle me-2"></i>{{ 'workoutDetail.addExercise' | t }}
           </button>
         </div>
       </div>
@@ -32,15 +35,15 @@
     <section class="mb-4" *ngIf="error">
       <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
         <span><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</span>
-        <button type="button" class="btn btn-sm btn-outline-danger" (click)="error = null">Dismiss</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="error = null">{{ 'common.dismiss' | t }}</button>
       </div>
     </section>
 
     <section class="loading-panel text-center py-5" *ngIf="loading && !workout.workoutExercises.length">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ 'common.loading' | t }}</span>
       </div>
-      <p class="mt-3 mb-0">Loading workout details...</p>
+      <p class="mt-3 mb-0">{{ 'workoutDetail.loading' | t }}</p>
     </section>
 
     <section class="row" *ngIf="workout.workoutExercises.length === 0 && !loading">
@@ -48,10 +51,10 @@
         <div class="card empty-state-card">
           <div class="card-body text-center py-5">
             <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
-            <h3 class="mb-3">No exercises added yet</h3>
-            <p class="text-muted mb-4">Add your first exercise to start tracking sets.</p>
+            <h3 class="mb-3">{{ 'workoutDetail.empty.title' | t }}</h3>
+            <p class="text-muted mb-4">{{ 'workoutDetail.empty.desc' | t }}</p>
             <button class="btn btn-primary btn-lg" (click)="openAddExerciseModal()">
-              <i class="bi bi-plus-circle me-2"></i>Add Exercise
+              <i class="bi bi-plus-circle me-2"></i>{{ 'workoutDetail.addExercise' | t }}
             </button>
           </div>
         </div>
@@ -88,19 +91,19 @@
                 <span class="exercise-title-wrap">
                   <span class="exercise-name">{{ workoutExercise.exerciseTitle }}</span>
                   <small class="exercise-meta">
-                    {{ workoutExercise.sets.length }} set{{ workoutExercise.sets.length === 1 ? '' : 's' }} logged
+                    {{ 'workoutDetail.setsLogged' | t:{ count: workoutExercise.sets.length, suffix: workoutExercise.sets.length === 1 ? '' : 's' } }}
                   </small>
-                  <small class="exercise-drag-hint">Drag to reorder</small>
+                  <small class="exercise-drag-hint">{{ 'workoutDetail.dragHint' | t }}</small>
                 </span>
               </h5>
               <div class="exercise-card-actions">
                 <button
                   class="btn btn-sm btn-outline-secondary"
                   (click)="toggleExerciseCollapsed(workoutExercise.id)"
-                  [title]="isExerciseCollapsed(workoutExercise.id) ? 'Expand exercise' : 'Collapse exercise'">
+                  [title]="isExerciseCollapsed(workoutExercise.id) ? ('workoutDetail.expandExercise' | t) : ('workoutDetail.collapseExercise' | t)">
                   <i class="bi" [ngClass]="isExerciseCollapsed(workoutExercise.id) ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="removeExercise(workoutExercise.id, workoutExercise.exerciseTitle)" title="Remove exercise">
+                <button class="btn btn-sm btn-outline-danger" (click)="removeExercise(workoutExercise.id, workoutExercise.exerciseTitle)" [title]="'workoutDetail.removeExercise' | t">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -113,10 +116,10 @@
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>Set</th>
-                    <th>Reps</th>
-                    <th>Weight (kg)</th>
-                    <th>Actions</th>
+                    <th>{{ 'workoutDetail.table.set' | t }}</th>
+                    <th>{{ 'workoutDetail.table.reps' | t }}</th>
+                    <th>{{ 'workoutDetail.table.weight' | t }}</th>
+                    <th>{{ 'workoutDetail.table.actions' | t }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -127,10 +130,10 @@
                     <td *ngIf="isEditingSet(set.id)" colspan="2">
                       <div class="row g-2">
                         <div class="col-5">
-                          <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
+                          <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" (focus)="onSetInputFocus('reps')" [placeholder]="'workoutDetail.placeholder.reps' | t">
                         </div>
                         <div class="col-5">
-                          <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
+                          <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" (focus)="onSetInputFocus('weight')" step="0.5" [placeholder]="'workoutDetail.placeholder.weight' | t">
                         </div>
                         <div class="col-2">
                           <button class="btn btn-sm btn-success" (click)="updateSet()">
@@ -141,10 +144,10 @@
                     </td>
                     <td>
                       <div class="btn-group btn-group-sm" *ngIf="!isEditingSet(set.id)">
-                        <button class="btn btn-outline-primary" (click)="startEditSet(set, workoutExercise.id)" title="Edit set">
+                        <button class="btn btn-outline-primary" (click)="startEditSet(set, workoutExercise.id)" [title]="'workoutDetail.editSet' | t">
                           <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-outline-danger" (click)="deleteSet(set.id, set.setNumber)" title="Delete set">
+                        <button class="btn btn-outline-danger" (click)="deleteSet(set.id, set.setNumber)" [title]="'workoutDetail.deleteSet' | t">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
@@ -160,21 +163,21 @@
                 <span class="set-chip">Set {{ getNextSetNumber(workoutExercise.sets) }}</span>
               </div>
               <div class="add-set-dock-fields">
-                <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" placeholder="Reps">
-                <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" step="0.5" placeholder="Weight">
+                <input type="number" min="1" class="form-control form-control-sm" [(ngModel)]="editingSet!.reps" (focus)="onSetInputFocus('reps')" [placeholder]="'workoutDetail.placeholder.reps' | t">
+                <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="editingSet!.weight" (focus)="onSetInputFocus('weight')" step="0.5" [placeholder]="'workoutDetail.placeholder.weight' | t">
               </div>
               <div class="add-set-dock-actions">
                 <button class="btn btn-sm btn-success" (click)="addSet()">
-                  <i class="bi bi-check-lg me-1"></i>Save
+                  <i class="bi bi-check-lg me-1"></i>{{ 'workoutDetail.save' | t }}
                 </button>
                 <button class="btn btn-sm btn-secondary" (click)="closeAddSetModal()">
-                  <i class="bi bi-x-lg me-1"></i>Cancel
+                  <i class="bi bi-x-lg me-1"></i>{{ 'common.cancel' | t }}
                 </button>
               </div>
             </div>
 
             <button class="btn btn-outline-primary btn-sm mt-2" (click)="openAddSetModal(workoutExercise.id)" *ngIf="!isAddingSet(workoutExercise.id)">
-              <i class="bi bi-plus-circle me-2"></i>Add Set
+              <i class="bi bi-plus-circle me-2"></i>{{ 'workoutDetail.addSet' | t }}
             </button>
           </div>
         </div>
@@ -187,12 +190,12 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Add Exercise</h5>
+        <h5 class="modal-title">{{ 'workoutDetail.addExercise' | t }}</h5>
         <button type="button" class="btn-close" (click)="closeAddExerciseModal()" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label for="exerciseSearch" class="form-label">Search Exercise</label>
+          <label for="exerciseSearch" class="form-label">{{ 'workoutDetail.searchExercise' | t }}</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input
@@ -201,11 +204,11 @@
               id="exerciseSearch"
               [(ngModel)]="exerciseQuery"
               (ngModelChange)="onExerciseQueryChange()"
-              placeholder="Type to search exercises...">
+              [placeholder]="'workoutDetail.searchPlaceholder' | t">
           </div>
           <small class="text-muted d-block mt-1">
-            <span *ngIf="exerciseSearchLoading">Searching...</span>
-            <span *ngIf="!exerciseSearchLoading">{{ filteredExercises.length }} results</span>
+            <span *ngIf="exerciseSearchLoading">{{ 'workoutDetail.searching' | t }}</span>
+            <span *ngIf="!exerciseSearchLoading">{{ 'workoutDetail.results' | t:{ count: filteredExercises.length } }}</span>
           </small>
         </div>
 
@@ -215,7 +218,7 @@
             class="exercise-result-item"
             *ngFor="let exercise of filteredExercises; trackBy: trackByExerciseId"
             [class.active]="selectedExerciseId === exercise.id"
-            (click)="selectExercise(exercise.id)">
+            (click)="addExercise(exercise.id)">
             <span class="exercise-result-main">
               <ng-container *ngIf="exercise.imageUrl; else exerciseSearchFallback">
                 <img
@@ -231,19 +234,15 @@
               </ng-template>
               <span class="exercise-title">{{ exercise.title }}</span>
             </span>
-            <span class="exercise-group" *ngIf="exercise.bodyGroup">{{ exercise.bodyGroup.name }}</span>
+            <span class="exercise-group" *ngIf="exercise.bodyGroup">{{ getBodyPartLabel(exercise.bodyGroup.name) }}</span>
           </button>
           <div class="exercise-empty" *ngIf="filteredExercises.length === 0">
-            No exercises match your search.
+            {{ 'workoutDetail.noResults' | t }}
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeAddExerciseModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="addExercise()" [disabled]="!selectedExerciseId || loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-          Add Exercise
-        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeAddExerciseModal()">{{ 'common.cancel' | t }}</button>
       </div>
     </div>
   </div>
@@ -251,10 +250,55 @@
 
 <div class="modal-backdrop fade" [class.show]="showAddExerciseModal" *ngIf="showAddExerciseModal" (click)="closeAddExerciseModal()"></div>
 
+<div class="modal fade" [class.show]="showEditWorkoutModal" [style.display]="showEditWorkoutModal ? 'block' : 'none'" tabindex="-1" *ngIf="showEditWorkoutModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ 'workoutDetail.edit.title' | t }}</h5>
+        <button type="button" class="btn-close" (click)="closeEditWorkoutModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="saveWorkoutDetails()">
+          <div class="mb-3">
+            <label for="editWorkoutTitle" class="form-label">{{ 'workouts.field.title' | t }}</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editWorkoutTitle"
+              [(ngModel)]="editWorkoutTitle"
+              name="editWorkoutTitle"
+              [placeholder]="'workouts.field.title.placeholder' | t"
+              required>
+          </div>
+          <div class="mb-3">
+            <label for="editWorkoutDate" class="form-label">{{ 'common.date' | t }}</label>
+            <input
+              type="date"
+              class="form-control"
+              id="editWorkoutDate"
+              [(ngModel)]="editWorkoutDate"
+              name="editWorkoutDate"
+              required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEditWorkoutModal()">{{ 'common.cancel' | t }}</button>
+        <button type="button" class="btn btn-primary" (click)="saveWorkoutDetails()" [disabled]="!editWorkoutTitle.trim() || !editWorkoutDate || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ 'workoutDetail.saveChanges' | t }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="showEditWorkoutModal" *ngIf="showEditWorkoutModal" (click)="closeEditWorkoutModal()"></div>
+
 <app-confirm-delete
   [isOpen]="showExerciseDeleteConfirm"
-  title="Remove Exercise"
-  message="Are you sure you want to remove this exercise from the workout?"
+  [title]="'workoutDetail.removeExerciseTitle' | t"
+  [message]="'workoutDetail.removeExerciseMessage' | t"
   [itemName]="deleteExerciseTitle || ''"
   [isLoading]="loading"
   (confirm)="onExerciseDeleteConfirm()"
@@ -263,8 +307,8 @@
 
 <app-confirm-delete
   [isOpen]="showSetDeleteConfirm"
-  title="Delete Set"
-  message="Are you sure you want to delete this set?"
+  [title]="'workoutDetail.deleteSetTitle' | t"
+  [message]="'workoutDetail.deleteSetMessage' | t"
   [itemName]="deleteSetLabel || ''"
   [isLoading]="loading"
   (confirm)="onSetDeleteConfirm()"

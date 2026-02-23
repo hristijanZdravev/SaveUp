@@ -3,13 +3,13 @@
     <section class="hero-panel mb-4 mb-md-5">
       <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
         <div>
-          <p class="section-kicker mb-2">Session Manager</p>
-          <h1 class="display-4 fw-bold mb-2">Workouts</h1>
-          <p class="lead mb-0">Track, filter, duplicate, and organize your training sessions.</p>
+          <p class="section-kicker mb-2">{{ 'workouts.kicker' | t }}</p>
+          <h1 class="display-4 fw-bold mb-2">{{ 'workouts.title' | t }}</h1>
+          <p class="lead mb-0">{{ 'workouts.subtitle' | t }}</p>
 
           <div class="filter-strip mt-3">
             <div class="filter-container">
-              <div class="filter-label">Time Range</div>
+              <div class="filter-label">{{ 'common.timeRange' | t }}</div>
               <div class="filter-buttons">
                 <button
                   *ngFor="let option of filterOptions"
@@ -25,7 +25,7 @@
         </div>
 
         <button class="btn btn-primary btn-lg" (click)="openCreateModal()" [disabled]="loading">
-          <i class="bi bi-plus-circle me-2"></i>New Workout
+          <i class="bi bi-plus-circle me-2"></i>{{ 'workouts.new' | t }}
         </button>
       </div>
 
@@ -34,15 +34,15 @@
     <section *ngIf="error" class="mb-4">
       <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
         <span><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</span>
-        <button type="button" class="btn btn-sm btn-outline-danger" (click)="error = null">Dismiss</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="error = null">{{ 'common.dismiss' | t }}</button>
       </div>
     </section>
 
     <section *ngIf="loading && workouts.length === 0" class="loading-panel text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ 'common.loading' | t }}</span>
       </div>
-      <p class="mt-3 mb-0">Loading workouts...</p>
+      <p class="mt-3 mb-0">{{ 'workouts.loading' | t }}</p>
     </section>
 
     <section class="row g-4" *ngIf="!loading || workouts.length > 0">
@@ -50,11 +50,11 @@
         <div class="card empty-state-card">
           <div class="card-body text-center py-5">
             <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
-            <h3 class="mb-3">No workouts found</h3>
-            <p class="text-muted mb-4" *ngIf="selectedFilter === 0">Start by creating a new workout.</p>
-            <p class="text-muted mb-4" *ngIf="selectedFilter !== 0">No workouts in this period. Try another filter.</p>
+            <h3 class="mb-3">{{ 'workouts.empty.title' | t }}</h3>
+            <p class="text-muted mb-4" *ngIf="selectedFilter === 0">{{ 'workouts.empty.all' | t }}</p>
+            <p class="text-muted mb-4" *ngIf="selectedFilter !== 0">{{ 'workouts.empty.filtered' | t }}</p>
             <button class="btn btn-primary btn-lg" (click)="openCreateModal()">
-              <i class="bi bi-plus-circle me-2"></i>Create Your First Workout
+              <i class="bi bi-plus-circle me-2"></i>{{ 'workouts.empty.create' | t }}
             </button>
           </div>
         </div>
@@ -79,13 +79,13 @@
           <div class="card-footer">
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
-                <i class="bi bi-arrow-right-circle me-1"></i>Click to view details
+                <i class="bi bi-arrow-right-circle me-1"></i>{{ 'workouts.card.view' | t }}
               </small>
               <button
                 class="btn btn-sm btn-outline-primary copy-btn"
                 (click)="copyWorkout(workout.id, $event)"
                 title="Copy workout">
-                <i class="bi bi-files me-1"></i>Copy
+                <i class="bi bi-files me-1"></i>{{ 'workouts.copy' | t }}
               </button>
             </div>
           </div>
@@ -99,7 +99,7 @@
           <ul class="pagination justify-content-center mb-2">
             <li class="page-item" [class.disabled]="currentPage === 1">
               <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
-                <i class="bi bi-chevron-left me-1"></i>Previous
+                <i class="bi bi-chevron-left me-1"></i>{{ 'pagination.prev' | t }}
               </button>
             </li>
 
@@ -111,13 +111,13 @@
 
             <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
               <button class="page-link" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
-                Next<i class="bi bi-chevron-right ms-1"></i>
+                {{ 'pagination.next' | t }}<i class="bi bi-chevron-right ms-1"></i>
               </button>
             </li>
           </ul>
         </nav>
         <div class="text-center page-meta">
-          <small>Page {{ currentPage }} of {{ getTotalPages() }} - Total: {{ totalWorkouts }} workouts</small>
+          <small>{{ 'pagination.meta' | t:{ current: currentPage, total: getTotalPages(), count: totalWorkouts } }}</small>
         </div>
       </div>
     </section>
@@ -128,24 +128,24 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Create New Workout</h5>
+        <h5 class="modal-title">{{ 'workouts.create.title' | t }}</h5>
         <button type="button" class="btn-close" (click)="closeCreateModal()" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form (ngSubmit)="createWorkout()">
           <div class="mb-3">
-            <label for="workoutTitle" class="form-label">Workout Title</label>
+            <label for="workoutTitle" class="form-label">{{ 'workouts.field.title' | t }}</label>
             <input
               type="text"
               class="form-control"
               id="workoutTitle"
               [(ngModel)]="newWorkoutTitle"
               name="workoutTitle"
-              placeholder="e.g., Push Day, Leg Day"
+              [placeholder]="'workouts.field.title.placeholder' | t"
               required>
           </div>
           <div class="mb-3">
-            <label for="workoutDate" class="form-label">Date</label>
+            <label for="workoutDate" class="form-label">{{ 'common.date' | t }}</label>
             <input
               type="date"
               class="form-control"
@@ -157,10 +157,10 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">Cancel</button>
+        <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">{{ 'common.cancel' | t }}</button>
         <button type="button" class="btn btn-primary" (click)="createWorkout()" [disabled]="!newWorkoutTitle.trim() || loading">
           <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-          Create Workout
+          {{ 'workouts.create.action' | t }}
         </button>
       </div>
     </div>
@@ -171,8 +171,8 @@
 
 <app-confirm-delete
   [isOpen]="showDeleteConfirm"
-  title="Delete Workout"
-  message="Are you sure you want to delete this workout? All exercises and sets will be permanently removed."
+  [title]="'workouts.delete.title' | t"
+  [message]="'workouts.delete.message' | t"
   [itemName]="deleteWorkoutTitle || ''"
   [isLoading]="loading"
   (confirm)="onDeleteConfirm()"

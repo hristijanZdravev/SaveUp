@@ -5,18 +5,18 @@
         <div class="col-lg-7">
           <div class="hero-content">
             <h1 class="hero-title display-3 fw-bold mb-4">
-              Track Your Progress,<br>
-              <span class="text-primary">Transform Your Body</span>
+              {{ 'main.hero.title.line1' | t }}<br>
+              <span class="text-primary">{{ 'main.hero.title.line2' | t }}</span>
             </h1>
             <p class="hero-subtitle lead mb-4">
-              The ultimate gym logging app to monitor your workouts, track your gains, and achieve your fitness goals.
+              {{ 'main.hero.subtitle' | t }}
             </p>
             <div class="hero-buttons">
               <button class="btn btn-primary btn-lg me-3 mb-3" (click)="navigateToApp()">
-                Get Started
+                {{ 'main.hero.cta.start' | t }}
               </button>
               <button class="btn btn-outline-primary btn-lg mb-3" (click)="scrollToFeatures()">
-                Learn More
+                {{ 'main.hero.cta.more' | t }}
               </button>
             </div>
           </div>
@@ -36,8 +36,8 @@
     <div class="container">
       <div class="row mb-5">
         <div class="col-12 text-center">
-          <h2 class="section-title display-4 fw-bold mb-3">Why Choose Our App?</h2>
-          <p class="section-subtitle lead text-primary">Everything you need to succeed in your fitness journey</p>
+          <h2 class="section-title display-4 fw-bold mb-3">{{ 'main.features.title' | t }}</h2>
+          <p class="section-subtitle lead text-primary">{{ 'main.features.subtitle' | t }}</p>
         </div>
       </div>
       <div class="row g-4">
@@ -46,9 +46,9 @@
             <div class="feature-icon">
               <i class="bi bi-clipboard-data"></i>
             </div>
-            <h3 class="feature-title">Workout Logging</h3>
+            <h3 class="feature-title">{{ 'main.feature.logging.title' | t }}</h3>
             <p class="feature-description">
-              Easily log your workouts, track exercises, sets, reps, and weights. Never forget what you did in the gym.
+              {{ 'main.feature.logging.desc' | t }}
             </p>
           </div>
         </div>
@@ -57,9 +57,9 @@
             <div class="feature-icon">
               <i class="bi bi-graph-up-arrow"></i>
             </div>
-            <h3 class="feature-title">Progress Tracking</h3>
+            <h3 class="feature-title">{{ 'main.feature.progress.title' | t }}</h3>
             <p class="feature-description">
-              Visualize your progress with charts and statistics. See your strength gains and improvements over time.
+              {{ 'main.feature.progress.desc' | t }}
             </p>
           </div>
         </div>
@@ -68,9 +68,9 @@
             <div class="feature-icon">
               <i class="bi bi-calendar-check"></i>
             </div>
-            <h3 class="feature-title">Workout Plans</h3>
+            <h3 class="feature-title">{{ 'main.feature.plans.title' | t }}</h3>
             <p class="feature-description">
-              Create and follow custom workout plans tailored to your goals. Stay consistent and motivated.
+              {{ 'main.feature.plans.desc' | t }}
             </p>
           </div>
         </div>
@@ -79,9 +79,9 @@
             <div class="feature-icon">
               <i class="bi bi-person-check"></i>
             </div>
-            <h3 class="feature-title">Personal Records</h3>
+            <h3 class="feature-title">{{ 'main.feature.records.title' | t }}</h3>
             <p class="feature-description">
-              Track your personal bests and celebrate milestones. Push yourself to beat your records.
+              {{ 'main.feature.records.desc' | t }}
             </p>
           </div>
         </div>
@@ -90,9 +90,9 @@
             <div class="feature-icon">
               <i class="bi bi-shield-check"></i>
             </div>
-            <h3 class="feature-title">Secure & Private</h3>
+            <h3 class="feature-title">{{ 'main.feature.secure.title' | t }}</h3>
             <p class="feature-description">
-              Your data is secure with enterprise-grade authentication. Your progress is yours alone.
+              {{ 'main.feature.secure.desc' | t }}
             </p>
           </div>
         </div>
@@ -101,9 +101,9 @@
             <div class="feature-icon">
               <i class="bi bi-device-ssd"></i>
             </div>
-            <h3 class="feature-title">Cross-Platform</h3>
+            <h3 class="feature-title">{{ 'main.feature.cross.title' | t }}</h3>
             <p class="feature-description">
-              Access your workout data anywhere, anytime. Works seamlessly on all your devices.
+              {{ 'main.feature.cross.desc' | t }}
             </p>
           </div>
         </div>
@@ -116,12 +116,12 @@
       <div class="row">
         <div class="col-lg-8 mx-auto text-center">
           <div class="cta-content">
-            <h2 class="cta-title display-5 fw-bold mb-4">Ready to Start Your Fitness Journey?</h2>
+            <h2 class="cta-title display-5 fw-bold mb-4">{{ 'main.cta.title' | t }}</h2>
             <p class="cta-subtitle lead mb-4">
-              Join thousands of users who are already tracking their progress and achieving their goals.
+              {{ 'main.cta.subtitle' | t }}
             </p>
             <button class="btn btn-primary btn-lg px-5" (click)="navigateToApp()">
-              Start Logging Now
+              {{ 'main.cta.button' | t }}
             </button>
           </div>
         </div>
@@ -134,7 +134,7 @@
       <div class="row">
         <div class="col-12 text-center">
           <p class="footer-text mb-0">
-            &copy; {{ currentYear }} Gym Logging App. Built with Angular & .NET
+            &copy; {{ currentYear }} {{ 'main.footer' | t }}
           </p>
         </div>
       </div>

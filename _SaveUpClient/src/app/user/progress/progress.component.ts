@@ -8,6 +8,9 @@ import {
   BodyPartDistributionDto,
   SetsPerDayDto
 } from '../../_services/analytics.service';
+import { LocaleService } from '../../_services/locale.service';
+import { I18nService } from '../../_services/i18n.service';
+import { TPipe } from '../../_pipes/t.pipe';
 
 interface BodyPartProgressItem {
   id: string;
@@ -29,7 +32,7 @@ interface DistributionChartPoint {
 
 @Component({
   selector: 'app-progress',
-  imports: [CommonModule],
+  imports: [CommonModule, TPipe],
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.css'
 })
@@ -41,10 +44,10 @@ export class ProgressComponent implements OnInit, OnDestroy {
   bodyPartProgress: BodyPartProgressItem[] = [];
   selectedDays = 7;
   readonly rangeOptions = [
-    { label: 'All Time', value: 0 },
-    { label: 'Last 7 Days', value: 7 },
-    { label: 'Last 14 Days', value: 14 },
-    { label: 'Last 30 Days', value: 30 }
+    { label: '', value: 0 },
+    { label: '', value: 7 },
+    { label: '', value: 14 },
+    { label: '', value: 30 }
   ];
 
   frequencyChart: FrequencyChartPoint[] = [];
@@ -55,7 +58,13 @@ export class ProgressComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private localeService: LocaleService,
+    private i18n: I18nService
+  ) {
+    this.setRangeOptions();
+  }
 
   ngOnInit(): void {
     this.loadProgress();
@@ -101,16 +110,28 @@ export class ProgressComponent implements OnInit, OnDestroy {
           this.stats = stats;
           this.setsPerDay = setsPerDay;
           this.distribution = distribution;
-          this.bodyPartProgress = bodyPartProgress.sort((a, b) => b.totalSets - a.totalSets);
+          this.bodyPartProgress = bodyPartProgress
+            .map((item) => ({
+              ...item,
+              name: this.i18n.translateBodyPart(item.name)
+            }))
+            .sort((a, b) => b.totalSets - a.totalSets);
           this.buildCharts();
           this.loading = false;
         },
         error: (err) => {
           console.error('Error loading progress data:', err);
-          this.error = 'Could not load progress analytics. Try again in a moment.';
+          this.error = this.i18n.t('error.progressLoad');
           this.loading = false;
         }
       });
+  }
+
+  private setRangeOptions(): void {
+    this.rangeOptions[0].label = this.i18n.t('range.allTime');
+    this.rangeOptions[1].label = this.i18n.t('range.last7');
+    this.rangeOptions[2].label = this.i18n.t('range.last14');
+    this.rangeOptions[3].label = this.i18n.t('range.last30');
   }
 
   get totalTrackedSets(): number {
@@ -154,18 +175,18 @@ export class ProgressComponent implements OnInit, OnDestroy {
   }
 
   formatVolume(volume: number): string {
-    return Math.round(volume).toLocaleString('en-US');
+    return Math.round(volume).toLocaleString(this.localeService.intlLocale);
   }
 
   formatDecimal(value: number): string {
-    return value.toLocaleString('en-US', {
+    return value.toLocaleString(this.localeService.intlLocale, {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1
     });
   }
 
   formatDayLabel(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(this.localeService.intlLocale, {
       month: 'short',
       day: 'numeric'
     });
@@ -205,7 +226,7 @@ export class ProgressComponent implements OnInit, OnDestroy {
       .map((entry) => {
         const widthPercent = maxDistribution > 0 ? Math.max(10, Math.round((entry.count / maxDistribution) * 100)) : 0;
         return {
-          label: entry.bodyPart,
+          label: this.i18n.translateBodyPart(entry.bodyPart),
           count: entry.count,
           widthPercent
         };

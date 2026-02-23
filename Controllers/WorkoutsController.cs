@@ -211,6 +211,48 @@ namespace SaveUp.Controllers
         }
 
         // =========================
+        // UPDATE WORKOUT
+        // =========================
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] WorkoutUpdateDto dto)
+        {
+            var userId = GetUserId();
+
+            var workout = await _context.Workouts
+                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
+
+            if (workout == null)
+                return NotFound();
+
+            workout.Title = dto.Title;
+            workout.Date = dto.Date;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // PUT: /api/workouts/sets/{setId}
+        [HttpPut("sets/{setId}")]
+        public async Task<IActionResult> UpdateSet(Guid setId, [FromBody] UpdateSetDto dto)
+        {
+            var userId = GetUserId();
+
+            var set = await _context.WorkoutSets
+                .Include(s => s.WorkoutExercise)
+                .ThenInclude(we => we.Workout)
+                .FirstOrDefaultAsync(s => s.Id == setId);
+
+            if (set == null || set.WorkoutExercise.Workout.UserId != userId)
+                return NotFound();
+
+            set.Reps = dto.Reps;
+            set.Weight = dto.Weight;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // =========================
         // DELETE SET
         // =========================
         [HttpDelete("sets/{setId}")]
@@ -223,6 +265,84 @@ namespace SaveUp.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // DELETE: /api/workouts/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var userId = GetUserId();
+
+            var workout = await _context.Workouts
+                .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
+
+            if (workout == null)
+                return NotFound();
+
+            _context.Workouts.Remove(workout);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+        // =========================
+        // DELETE EXERCISE FROM WORKOUT
+        // =========================
+        [HttpDelete("exercises/{workoutExerciseId}")]
+        public async Task<IActionResult> DeleteExercise(Guid workoutExerciseId)
+        {
+            var userId = GetUserId();
+
+            var workoutExercise = await _context.WorkoutExercises
+                .Include(x => x.Workout)
+                .FirstOrDefaultAsync(x => x.Id == workoutExerciseId);
+
+            if (workoutExercise == null || workoutExercise.Workout.UserId != userId)
+                return NotFound();
+
+            _context.WorkoutExercises.Remove(workoutExercise);
+
+            // 🔥 OPTIONAL: reorder after delete (recommended)
+            var remaining = await _context.WorkoutExercises
+                .Where(x => x.WorkoutId == workoutExercise.WorkoutId)
+                .OrderBy(x => x.Order)
+                .ToListAsync();
+
+            int order = 1;
+            foreach (var ex in remaining)
+            {
+                ex.Order = order++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // GET: /api/workouts/filter?days=7
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterByDays([FromQuery] int days = 7)
+        {
+            var userId = GetUserId();
+
+            if (days <= 0)
+                return BadRequest("Days must be greater than 0");
+
+            var startDate = DateTime.UtcNow.AddDays(-days);
+
+            var workouts = await _context.Workouts
+                .Where(w => w.UserId == userId && w.Date >= startDate)
+                .OrderByDescending(w => w.Date)
+                .Select(w => new WorkoutListDto
+                {
+                    Id = w.Id,
+                    Title = w.Title,
+                    Date = w.Date
+                })
+                .ToListAsync();
+
+            return Ok(workouts);
         }
     }
 }

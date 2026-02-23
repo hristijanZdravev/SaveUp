@@ -6,15 +6,15 @@
           <span class="danger-chip">
             <i class="bi bi-exclamation-triangle-fill"></i>
           </span>
-          <h5 class="modal-title mb-0">{{ title }}</h5>
+          <h5 class="modal-title mb-0">{{ title || ('confirm.defaultTitle' | t) }}</h5>
         </div>
         <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close" [disabled]="isLoading"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-2 body-message">{{ message }}</p>
+        <p class="mb-2 body-message">{{ message || ('confirm.defaultMessage' | t) }}</p>
 
         <div class="item-highlight" *ngIf="itemName">
-          <span class="item-label">Selected</span>
+          <span class="item-label">{{ 'confirm.selected' | t }}</span>
           <p class="mb-0 item-name">
             <i class="bi bi-bookmark-fill me-2"></i>{{ itemName }}
           </p>
@@ -22,20 +22,20 @@
 
         <div class="danger-note mt-3">
           <i class="bi bi-shield-exclamation me-2"></i>
-          <span>This action cannot be undone.</span>
+          <span>{{ 'confirm.cannotUndo' | t }}</span>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isLoading">
-          Cancel
+          {{ 'common.cancel' | t }}
         </button>
         <button type="button" class="btn btn-danger" (click)="onConfirm()" [disabled]="isLoading">
           <span *ngIf="!isLoading">
-            <i class="bi bi-trash me-2"></i>Delete
+            <i class="bi bi-trash me-2"></i>{{ 'confirm.delete' | t }}
           </span>
           <span *ngIf="isLoading">
             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            Deleting...
+            {{ 'confirm.deleting' | t }}
           </span>
         </button>
       </div>

@@ -8,10 +8,13 @@ import {
   DashboardStatsDto,
   RecentWorkoutDto
 } from '../../_services/analytics.service';
+import { LocaleService } from '../../_services/locale.service';
+import { I18nService } from '../../_services/i18n.service';
+import { TPipe } from '../../_pipes/t.pipe';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -21,10 +24,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   recentWorkouts: RecentWorkoutDto[] = [];
   selectedDays = 7;
   readonly rangeOptions = [
-    { label: 'All Time', value: 0 },
-    { label: 'Last 7 Days', value: 7 },
-    { label: 'Last 14 Days', value: 14 },
-    { label: 'Last 30 Days', value: 30 }
+    { label: '', value: 0 },
+    { label: '', value: 7 },
+    { label: '', value: 14 },
+    { label: '', value: 30 }
   ];
 
   loading = false;
@@ -32,7 +35,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private localeService: LocaleService,
+    private i18n: I18nService
+  ) {
+    this.setRangeOptions();
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -62,10 +71,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error loading dashboard data:', err);
-          this.error = 'Could not load dashboard data. Try again in a moment.';
+          this.error = this.i18n.t('error.dashboardLoad');
           this.loading = false;
         }
       });
+  }
+
+  private setRangeOptions(): void {
+    this.rangeOptions[0].label = this.i18n.t('range.allTime');
+    this.rangeOptions[1].label = this.i18n.t('range.last7');
+    this.rangeOptions[2].label = this.i18n.t('range.last14');
+    this.rangeOptions[3].label = this.i18n.t('range.last30');
   }
 
   get avgRepsPerSet(): number {
@@ -93,19 +109,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return this.localeService.formatShortDate(dateString);
   }
 
   formatVolume(volume: number): string {
-    return Math.round(volume).toLocaleString('en-US');
+    return Math.round(volume).toLocaleString(this.localeService.intlLocale);
   }
 
   formatDecimal(value: number): string {
-    return value.toLocaleString('en-US', {
+    return value.toLocaleString(this.localeService.intlLocale, {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1
     });

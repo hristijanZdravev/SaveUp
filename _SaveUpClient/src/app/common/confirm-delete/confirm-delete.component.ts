@@ -1,17 +1,18 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TPipe } from '../../_pipes/t.pipe';
 
 @Component({
   selector: 'app-confirm-delete',
-  imports: [CommonModule],
+  imports: [CommonModule, TPipe],
   standalone: true,
   templateUrl: './confirm-delete.component.html',
   styleUrl: './confirm-delete.component.css'
 })
 export class ConfirmDeleteComponent {
   @Input() isOpen = false;
-  @Input() title = 'Confirm Delete';
-  @Input() message = 'Are you sure you want to delete this item?';
+  @Input() title = '';
+  @Input() message = '';
   @Input() itemName = '';
   @Input() isLoading = false;
 

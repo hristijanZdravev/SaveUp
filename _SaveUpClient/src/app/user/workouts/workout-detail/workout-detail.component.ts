@@ -6,10 +6,13 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap,
 import { WorkoutService, WorkoutDetails, WorkoutExercise, Exercise, Set as WorkoutSet, AddSetRequest, UpdateSetRequest } from '../../../_services/workout.service';
 import { ExerciseService } from '../../../_services/exercise.service';
 import { ConfirmDeleteComponent } from '../../../common/confirm-delete/confirm-delete.component';
+import { LocaleService } from '../../../_services/locale.service';
+import { I18nService } from '../../../_services/i18n.service';
+import { TPipe } from '../../../_pipes/t.pipe';
 
 @Component({
   selector: 'app-workout-detail',
-  imports: [CommonModule, FormsModule, ConfirmDeleteComponent],
+  imports: [CommonModule, FormsModule, ConfirmDeleteComponent, TPipe],
   templateUrl: './workout-detail.component.html',
   styleUrl: './workout-detail.component.css'
 })
@@ -22,6 +25,9 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   showAddExerciseModal = false;
+  showEditWorkoutModal = false;
+  editWorkoutTitle = '';
+  editWorkoutDate = '';
   selectedExerciseId = '';
   showExerciseDeleteConfirm = false;
   deleteExerciseId: string | null = null;
@@ -30,7 +36,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   deleteSetId: string | null = null;
   deleteSetLabel: string | null = null;
   editingSetId: string | null = null;
-  editingSet: { reps: number; weight: number } | null = null;
+  editingSet: { reps: number | null; weight: number | null } | null = null;
   draggedExerciseId: string | null = null;
   dragOverExerciseId: string | null = null;
   reordering = false;
@@ -45,7 +51,9 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     private workoutService: WorkoutService,
     private exerciseService: ExerciseService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private localeService: LocaleService,
+    private i18n: I18nService
   ) {}
 
   ngOnInit() {
@@ -78,7 +86,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error loading workout details:', err);
-          this.error = 'Failed to load workout details. Please try again.';
+          this.error = this.i18n.t('error.workoutDetails');
           this.loading = false;
         }
       });
@@ -130,17 +138,35 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     this.selectedExerciseId = exerciseId;
   }
 
+  openEditWorkoutModal() {
+    if (!this.workout) {
+      return;
+    }
+
+    this.showEditWorkoutModal = true;
+    this.editWorkoutTitle = this.workout.title;
+    this.editWorkoutDate = this.toDateInputValue(this.workout.date);
+  }
+
+  closeEditWorkoutModal() {
+    this.showEditWorkoutModal = false;
+    this.editWorkoutTitle = '';
+    this.editWorkoutDate = '';
+  }
+
   onExerciseQueryChange() {
     this.exerciseSearch$.next(this.exerciseQuery);
   }
 
-  addExercise() {
-    if (!this.selectedExerciseId || !this.workout) {
+  addExercise(exerciseId?: string) {
+    const targetExerciseId = exerciseId ?? this.selectedExerciseId;
+    if (!targetExerciseId || !this.workout || this.loading) {
       return;
     }
 
+    this.selectedExerciseId = targetExerciseId;
     this.loading = true;
-    this.workoutService.addExerciseToWorkout(this.workout.id, this.selectedExerciseId)
+    this.workoutService.addExerciseToWorkout(this.workout.id, targetExerciseId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -149,7 +175,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error adding exercise:', err);
-          this.error = 'Failed to add exercise. Please try again.';
+          this.error = this.i18n.t('error.exerciseAdd');
           this.loading = false;
         }
       });
@@ -176,7 +202,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error removing exercise:', err);
-          this.error = 'Failed to remove exercise. Please try again.';
+          this.error = this.i18n.t('error.exerciseRemove');
           this.loading = false;
           this.showExerciseDeleteConfirm = false;
           this.deleteExerciseId = null;
@@ -200,7 +226,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
       : 1;
 
     this.editingSetId = workoutExerciseId;
-    this.editingSet = { reps: 10, weight: 0 };
+    this.editingSet = { reps: 10, weight: null };
     (this.editingSet as any).setNumber = nextSetNumber;
     (this.editingSet as any).workoutExerciseId = workoutExerciseId;
   }
@@ -213,11 +239,16 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   addSet() {
     if (!this.editingSet || !this.editingSetId) return;
 
+    if (!this.hasNumericOnlySetInputs(this.editingSet.reps, this.editingSet.weight)) {
+      this.error = this.i18n.t('error.numericOnly');
+      return;
+    }
+
     const repsValue = Number(this.editingSet.reps);
     const weightValue = Number(this.editingSet.weight);
 
     if (!this.isValidSetInputs(repsValue, weightValue)) {
-      this.error = 'Reps must be a number greater than 0, and weight must be a valid number.';
+      this.error = this.i18n.t('error.invalidSet');
       return;
     }
 
@@ -237,7 +268,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error adding set:', err);
-          this.error = 'Failed to add set. Please try again.';
+          this.error = this.i18n.t('error.setAdd');
           this.loading = false;
         }
       });
@@ -259,7 +290,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     const weightValue = Number(this.editingSet.weight);
 
     if (!this.isValidSetInputs(repsValue, weightValue)) {
-      this.error = 'Reps must be a number greater than 0, and weight must be a valid number.';
+      this.error = this.i18n.t('error.invalidSet');
       return;
     }
 
@@ -278,7 +309,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error updating set:', err);
-          this.error = 'Failed to update set. Please try again.';
+          this.error = this.i18n.t('error.setUpdate');
           this.loading = false;
         }
       });
@@ -286,7 +317,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
 
   deleteSet(setId: string, setNumber: number) {
     this.deleteSetId = setId;
-    this.deleteSetLabel = `Set ${setNumber}`;
+    this.deleteSetLabel = this.i18n.t('workoutDetail.setLabel', { number: setNumber });
     this.showSetDeleteConfirm = true;
   }
 
@@ -305,7 +336,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error deleting set:', err);
-          this.error = 'Failed to delete set. Please try again.';
+          this.error = this.i18n.t('error.setDelete');
           this.loading = false;
           this.showSetDeleteConfirm = false;
           this.deleteSetId = null;
@@ -321,12 +352,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return this.localeService.formatShortDate(dateString);
   }
 
   isEditingSet(setId: string): boolean {
@@ -350,6 +376,10 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
 
   getExerciseImageUrl(exerciseId: string): string | null {
     return this.exerciseImageMap[exerciseId] ?? null;
+  }
+
+  getBodyPartLabel(name: string | null | undefined): string {
+    return this.i18n.translateBodyPart(name);
   }
 
   onExerciseDragStart(workoutExerciseId: string, event: DragEvent): void {
@@ -505,6 +535,73 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
     return Number.isFinite(reps) && reps > 0 && Number.isFinite(weight) && weight >= 0;
   }
 
+  private hasNumericOnlySetInputs(reps: number | null, weight: number | null): boolean {
+    if (reps === null || weight === null) {
+      return false;
+    }
+
+    const repsText = String(reps).trim();
+    const weightText = String(weight).trim();
+
+    const repsNumericOnly = /^\d+$/.test(repsText);
+    const weightNumericOnly = /^\d+(\.\d+)?$/.test(weightText);
+
+    return repsNumericOnly && weightNumericOnly;
+  }
+
+  onSetInputFocus(field: 'reps' | 'weight'): void {
+    if (!this.editingSet) {
+      return;
+    }
+
+    if (this.editingSet[field] === 0) {
+      this.editingSet[field] = null;
+    }
+  }
+
+  saveWorkoutDetails() {
+    if (!this.workout || !this.editWorkoutTitle.trim() || !this.editWorkoutDate) {
+      return;
+    }
+
+    this.loading = true;
+    this.error = null;
+    this.workoutService.updateWorkout(this.workout.id, {
+      title: this.editWorkoutTitle.trim(),
+      date: this.editWorkoutDate
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          const workoutId = this.workout!.id;
+          this.closeEditWorkoutModal();
+          this.loadWorkoutDetails(workoutId);
+        },
+        error: (err) => {
+          console.error('Error updating workout:', err);
+          this.error = this.i18n.t('error.workoutUpdate');
+          this.loading = false;
+        }
+      });
+  }
+
+  private toDateInputValue(dateString: string): string {
+    const matchedDate = /^(\d{4}-\d{2}-\d{2})/.exec(dateString)?.[1];
+    if (matchedDate) {
+      return matchedDate;
+    }
+
+    const parsed = new Date(dateString);
+    if (Number.isNaN(parsed.getTime())) {
+      return '';
+    }
+
+    const year = parsed.getFullYear();
+    const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+    const day = `${parsed.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private persistWorkoutExerciseOrder(previousOrder: WorkoutExercise[]): void {
     if (!this.workout) {
       return;
@@ -526,7 +623,7 @@ export class WorkoutDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error reordering exercises:', err);
-          this.error = 'Failed to save exercise order. Please try again.';
+          this.error = this.i18n.t('error.reorder');
           if (this.workout) {
             this.workout = {
               ...this.workout,

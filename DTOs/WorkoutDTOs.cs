@@ -25,6 +25,12 @@
         public List<WorkoutExerciseDto> Exercises { get; set; } = new();
     }
 
+    public class WorkoutUpdateDto
+{
+    public string Title { get; set; } = null!;
+    public DateTime Date { get; set; }
+}
+
     // =========================
     // WORKOUT EXERCISE
     // =========================
@@ -58,6 +64,12 @@
     {
         public Guid Id { get; set; }
         public int SetNumber { get; set; }
+        public int Reps { get; set; }
+        public decimal Weight { get; set; }
+    }
+
+    public class UpdateSetDto
+    {
         public int Reps { get; set; }
         public decimal Weight { get; set; }
     }

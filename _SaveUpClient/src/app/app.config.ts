@@ -4,10 +4,12 @@ import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { KeycloakAngularModule, KeycloakBearerInterceptor, KeycloakService } from 'keycloak-angular';
 import { environment } from '../environments/environment';
+import { LocaleService } from './_services/locale.service';
 
-function initializeKeycloak(keycloak: KeycloakService)  {
-    return () =>
-      keycloak.init({
+function initializeKeycloak(keycloak: KeycloakService, localeService: LocaleService)  {
+    return async () => {
+      localeService.applyLocale('en');
+      await keycloak.init({
         config: {
           url: environment.keycloakUrl,
           realm: environment.keycloakRealm,
@@ -22,6 +24,9 @@ function initializeKeycloak(keycloak: KeycloakService)  {
         enableBearerInterceptor: true,
         bearerPrefix: 'Bearer ',
     });
+      const tokenLocale = (keycloak.getKeycloakInstance().tokenParsed as { locale?: string } | undefined)?.locale;
+      localeService.applyLocale(tokenLocale);
+    };
 }
 
 // Provider for Keycloak Bearer Interceptor
@@ -43,7 +48,7 @@ export const appConfig: ApplicationConfig = {
         provide: APP_INITIALIZER,
         useFactory: initializeKeycloak,
         multi: true,
-        deps: [KeycloakService]
+        deps: [KeycloakService, LocaleService]
     },
   ]
 };

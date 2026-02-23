@@ -1,11 +1,11 @@
 <div class="status-shell">
   <div class="container py-5">
     <div class="status-card text-center mx-auto">
-      <p class="kicker mb-2">Session</p>
-      <h1 class="display-5 fw-bold mb-2">You Have Been Logged Out</h1>
-      <p class="lead mb-4">Your session ended successfully. You can sign in again anytime.</p>
+      <p class="kicker mb-2">{{ 'logout.kicker' | t }}</p>
+      <h1 class="display-5 fw-bold mb-2">{{ 'logout.title' | t }}</h1>
+      <p class="lead mb-4">{{ 'logout.desc' | t }}</p>
       <a href="/dashboard" class="btn btn-primary btn-lg">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Return to App
+        <i class="bi bi-box-arrow-in-right me-2"></i>{{ 'logout.cta' | t }}
       </a>
     </div>
   </div>

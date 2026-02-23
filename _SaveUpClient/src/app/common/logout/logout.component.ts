@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { TPipe } from '../../_pipes/t.pipe';
 
 @Component({
   selector: 'app-logout',
-  imports: [],
+  imports: [TPipe],
   standalone: true,
   templateUrl: './logout.component.html',
   styleUrl: './logout.component.css'
