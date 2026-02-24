@@ -44,14 +44,42 @@ body {
 }
 
 /* Remove account header brand/logo area and user menu bubble/name */
-.pf-c-masthead__brand,
-.pf-v5-c-masthead__brand,
-.pf-c-page__header-brand,
-.pf-v5-c-page__header-brand,
+/* Keep brand area visible for custom logo/title; hide user dropdowns. */
 .pf-c-masthead__content > .pf-c-dropdown,
 .pf-v5-c-masthead__content > .pf-v5-c-dropdown,
 [data-testid="header-user-dropdown"],
 [data-testid="header-user-dropdown-toggle"] {
+  display: none !important;
+}
+
+.pf-c-masthead__brand,
+.pf-v5-c-masthead__brand,
+.pf-c-page__header-brand,
+.pf-v5-c-page__header-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  min-height: 44px !important;
+  margin-inline-start: 0.75rem !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+.pf-c-masthead__brand::after,
+.pf-v5-c-masthead__brand::after,
+.pf-c-page__header-brand::after,
+.pf-v5-c-page__header-brand::after {
+  content: "Account settings";
+  font-size: 1.9rem !important;
+  font-weight: 800 !important;
+  color: var(--peak-primary) !important;
+  text-shadow: 0 0 14px rgba(224, 80, 40, 0.35);
+}
+
+.pf-c-masthead__brand > *,
+.pf-v5-c-masthead__brand > *,
+.pf-c-page__header-brand > *,
+.pf-v5-c-page__header-brand > * {
   display: none !important;
 }
 

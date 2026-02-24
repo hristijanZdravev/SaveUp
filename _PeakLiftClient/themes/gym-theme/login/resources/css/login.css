@@ -41,6 +41,7 @@ body {
 #kc-header-wrapper {
   font-size: 0 !important;
   line-height: 1 !important;
+  display: inline-block !important;
 }
 
 #kc-header-wrapper::after {

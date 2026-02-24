@@ -18,12 +18,15 @@ obj/
 *.bak
 *.tmp
 *.DS_Store
+*.env
 
 # ASP.NET specific
 appsettings.Development.json
 appsettings.Local.json
 
 # Angular
+_PeakLiftClient/.codex-tmp
+_PeakLiftClient/.tmp
 _PeakLiftClient/node_modules/
 _PeakLiftClient/dist/
 _PeakLiftClient/.angular/
